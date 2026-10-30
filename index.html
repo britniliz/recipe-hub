@@ -459,7 +459,7 @@
         <div>
           <span class="text-xs font-mono uppercase tracking-widest text-terracotta-600 font-semibold">Weekly Atelier</span>
           <h2 class="font-serif text-3xl font-bold text-charcoal-900 mt-0.5">The Weekly Menu</h2>
-          <p class="text-sm text-charcoal-800/70 mt-1">Curate Monday through Sunday. Scheduled dishes will feed the dynamic Market Basket.</p>
+          <p class="text-sm text-charcoal-800/70 mt-1">Curate meals across days with cook &amp; leftover tracking, plus weekly bakery favorites.</p>
         </div>
         <div class="flex items-center gap-3 w-full md:w-auto">
           <button onclick="clearWeeklyPlan()" class="text-xs text-charcoal-800/70 hover:text-rose-700 px-3.5 py-2.5 rounded-xl border border-parchment-300 hover:border-rose-300 bg-white transition-colors flex items-center gap-1.5 font-medium">
@@ -468,6 +468,29 @@
           <button onclick="switchTab('shopping')" class="flex-1 md:flex-none bg-botanical-800 hover:bg-botanical-700 text-parchment-50 text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-xl shadow-md flex items-center justify-center gap-2 transition-all border border-brass-500/30">
             <i data-lucide="shopping-basket" class="w-4 h-4 text-brass-400"></i> Harvest to Basket (<span id="planner-ingredients-count">0</span> items)
           </button>
+        </div>
+      </div>
+
+      <!-- Dedicated Weekly Baked Goods & Hearth Section (Unassigned to specific days) -->
+      <div class="bg-parchment-50 paper-deckled rounded-3xl p-6 shadow-paper border border-brass-500/30 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-parchment-300">
+          <div class="flex items-center gap-2.5">
+            <span class="w-9 h-9 rounded-xl bg-brass-500/20 text-brass-600 flex items-center justify-center text-lg">🍞</span>
+            <div>
+              <h3 class="font-serif font-bold text-lg text-charcoal-900">Weekly Bakes &amp; Treats</h3>
+              <p class="text-xs text-charcoal-800/60">Baked goods, breads, &amp; pantry confections made for the week at large (independent of days).</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <select id="quick-add-baked-select" onchange="handleBakedGoodSelect(this)" class="text-xs bg-white border border-parchment-300 rounded-xl px-3 py-2 text-charcoal-800 focus:ring-1 focus:ring-botanical-700 font-serif">
+              <option value="">+ Add Weekly Bake / Treat...</option>
+              <!-- Populated by JS -->
+            </select>
+          </div>
+        </div>
+
+        <div id="weekly-baked-goods-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          <!-- Rendered dynamically -->
         </div>
       </div>
 
@@ -552,49 +575,63 @@
     </div>
   </div>
 
-  <!-- QUICK ADD TO PLAN MODAL -->
+  <!-- MULTI-DAY MEAL SCHEDULER MODAL -->
   <div id="add-to-plan-modal" class="fixed inset-0 z-50 bg-botanical-950/70 backdrop-blur-xs flex items-center justify-center p-4 hidden">
-    <div class="bg-parchment-50 paper-deckled rounded-3xl max-w-sm w-full p-6 shadow-floating border border-brass-500/40 space-y-4">
-      <div class="flex items-center justify-between pb-2 border-b border-parchment-300">
-        <h3 class="font-serif font-bold text-xl text-charcoal-900">Schedule Dish</h3>
+    <div class="bg-parchment-50 paper-deckled rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-floating border border-brass-500/40 space-y-5">
+      <div class="flex items-center justify-between pb-3 border-b border-parchment-300">
+        <div>
+          <span class="text-[10px] font-mono uppercase tracking-widest text-terracotta-600 font-bold">Meal Scheduler</span>
+          <h3 class="font-serif font-bold text-2xl text-charcoal-900 mt-0.5">Schedule Dish</h3>
+        </div>
         <button onclick="closeAddToPlanModal()" class="text-charcoal-800/50 hover:text-charcoal-900">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
       <div class="text-sm text-charcoal-800">
-        Adding <span id="quick-plan-recipe-title" class="font-serif font-bold text-terracotta-600"></span> to your week:
+        Assign <span id="quick-plan-recipe-title" class="font-serif font-bold text-terracotta-600"></span> to your weekly plan:
       </div>
 
       <input type="hidden" id="quick-plan-recipe-id" value="">
 
-      <div class="space-y-3">
-        <div>
-          <label class="block text-[11px] font-mono font-bold uppercase tracking-wider text-charcoal-800 mb-1">Target Day</label>
-          <select id="quick-plan-day" class="w-full bg-white border border-parchment-300 rounded-xl px-3 py-2.5 text-sm text-charcoal-900">
-            <option value="Monday">Monday</option>
-            <option value="Tuesday">Tuesday</option>
-            <option value="Wednesday">Wednesday</option>
-            <option value="Thursday">Thursday</option>
-            <option value="Friday">Friday</option>
-            <option value="Saturday">Saturday</option>
-            <option value="Sunday">Sunday</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-mono font-bold uppercase tracking-wider text-charcoal-800 mb-1">Meal Table</label>
-          <select id="quick-plan-slot" class="w-full bg-white border border-parchment-300 rounded-xl px-3 py-2.5 text-sm text-charcoal-900">
-            <option value="Dinner" selected>Dinner Course</option>
-            <option value="Lunch">Midday Meal</option>
-            <option value="Breakfast">Breakfast &amp; Hearth</option>
-          </select>
+      <!-- Category selection: Meal Slot or Weekly Baked Good -->
+      <div>
+        <label class="block text-[11px] font-mono font-bold uppercase tracking-wider text-charcoal-800 mb-1.5">Category</label>
+        <div class="grid grid-cols-4 gap-2 text-xs">
+          <label class="cursor-pointer">
+            <input type="radio" name="plan-category" value="Dinner" checked onchange="togglePlanCategoryMode('daily')" class="peer sr-only">
+            <div class="p-2.5 rounded-xl border border-parchment-300 text-center peer-checked:border-botanical-800 peer-checked:bg-botanical-800 peer-checked:text-parchment-50 font-serif font-semibold">Dinner</div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="plan-category" value="Lunch" onchange="togglePlanCategoryMode('daily')" class="peer sr-only">
+            <div class="p-2.5 rounded-xl border border-parchment-300 text-center peer-checked:border-botanical-800 peer-checked:bg-botanical-800 peer-checked:text-parchment-50 font-serif font-semibold">Lunch</div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="plan-category" value="Breakfast" onchange="togglePlanCategoryMode('daily')" class="peer sr-only">
+            <div class="p-2.5 rounded-xl border border-parchment-300 text-center peer-checked:border-botanical-800 peer-checked:bg-botanical-800 peer-checked:text-parchment-50 font-serif font-semibold">Breakfast</div>
+          </label>
+          <label class="cursor-pointer">
+            <input type="radio" name="plan-category" value="Baked Goods" onchange="togglePlanCategoryMode('baked')" class="peer sr-only">
+            <div class="p-2.5 rounded-xl border border-parchment-300 text-center peer-checked:border-terracotta-600 peer-checked:bg-terracotta-600 peer-checked:text-white font-serif font-semibold">Baked Good 🍞</div>
+          </label>
         </div>
       </div>
 
-      <div class="flex gap-2.5 pt-2">
+      <!-- Multi-day selection box (Hidden if Baked Goods selected) -->
+      <div id="plan-daily-options" class="space-y-3">
+        <label class="block text-[11px] font-mono font-bold uppercase tracking-wider text-charcoal-800">
+          Select Day(s) &amp; Designate Fresh Cook vs Leftovers
+        </label>
+        <p class="text-[11px] text-charcoal-800/60 leading-normal">Cook a large batch on one day and carry over leftovers to subsequent days:</p>
+
+        <div class="space-y-2 max-h-56 overflow-y-auto pr-1" id="multi-day-selectors-container">
+          <!-- Populated by JS for Mon-Sun -->
+        </div>
+      </div>
+
+      <div class="flex gap-2.5 pt-3 border-t border-parchment-300">
         <button onclick="closeAddToPlanModal()" class="flex-1 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-charcoal-800/70 hover:bg-parchment-200 rounded-xl">Cancel</button>
-        <button onclick="confirmAddToPlan()" class="flex-1 bg-botanical-800 hover:bg-botanical-700 text-parchment-50 text-xs font-bold uppercase tracking-wider py-2.5 rounded-xl shadow-xs border border-brass-500/30">Add to Table</button>
+        <button onclick="confirmMultiDayAddToPlan()" class="flex-1 bg-botanical-800 hover:bg-botanical-700 text-parchment-50 text-xs font-bold uppercase tracking-wider py-2.5 rounded-xl shadow-xs border border-brass-500/30">Schedule Selected</button>
       </div>
     </div>
   </div>
@@ -605,7 +642,7 @@
        INDEXEDDB STORAGE FOR UNLIMITED LOCAL PERSISTENCE
        ===================================================================== */
     const DB_NAME = 'SavorAndThymeDB';
-    const DB_VERSION = 1;
+    const DB_VERSION = 2; // Incremented for baked goods & multi-day upgrades
 
     function openDatabase() {
       return new Promise((resolve, reject) => {
@@ -617,6 +654,9 @@
           }
           if (!db.objectStoreNames.contains('planner')) {
             db.createObjectStore('planner', { keyPath: 'day' });
+          }
+          if (!db.objectStoreNames.contains('weekly_bakes')) {
+            db.createObjectStore('weekly_bakes', { keyPath: 'id' });
           }
           if (!db.objectStoreNames.contains('shopping_custom')) {
             db.createObjectStore('shopping_custom', { keyPath: 'id' });
@@ -672,7 +712,7 @@
     }
 
     /* =====================================================================
-       SAMPLE HEIRLOOM RECIPES
+       SAMPLE HEIRLOOM RECIPES (WITH PREP DETAILS & IMAGES/IMAGELESS MIX)
        ===================================================================== */
     const SEED_RECIPES = [
       {
@@ -684,101 +724,81 @@
         servings: 4,
         tags: ["Gluten-Free", "Cast Iron", "Quick Dinners", "Entertaining"],
         imageUrl: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=1000&q=80",
-        ratings: {
-          taste: 5,
-          ease: 4,
-          presentation: 5,
-          leftovers: 3
-        },
-        tweaks: "Next time: Pat the skin dry with cloth towels and dust with a whisper of cornstarch before searing in ghee. Finish with a grating of fresh Meyer lemon zest to pierce the velvet cream.",
+        ratings: { taste: 5, ease: 4, presentation: 5, leftovers: 3 },
+        tweaks: "Pat the skin bone-dry and dust with cornstarch for shatter-crisp texture. Finish with Meyer lemon zest.",
         ingredients: [
-          { amount: "4", unit: "fillets (6 oz each)", name: "Wild Alaskan Salmon", category: "Meat & Seafood" },
-          { amount: "2", unit: "tbsp", name: "Cold-Pressed Olive Oil", category: "Pantry & Spices" },
-          { amount: "2", unit: "tbsp", name: "Cultured Butter", category: "Dairy & Cold" },
-          { amount: "6", unit: "cloves", name: "Garlic, finely grated", category: "Produce" },
-          { amount: "0.5", unit: "cup", name: "Sun-dried tomatoes in extra virgin oil, sliced", category: "Pantry & Spices" },
-          { amount: "1", unit: "cup", name: "Heavy Cream", category: "Dairy & Cold" },
-          { amount: "3", unit: "cups", name: "Young Spinach Leaves", category: "Produce" },
-          { amount: "0.5", unit: "cup", name: "Parmigiano-Reggiano, freshly microplaned", category: "Dairy & Cold" },
-          { amount: "0.25", unit: "cup", name: "Fresh Basil leaves", category: "Produce" }
+          { amount: "4", unit: "fillets (6 oz)", name: "Wild Alaskan Salmon", detail: "skin-on, scaled and pin bones removed", category: "Meat & Seafood" },
+          { amount: "2", unit: "tbsp", name: "Olive Oil", detail: "extra virgin, cold-pressed", category: "Pantry & Spices" },
+          { amount: "2", unit: "tbsp", name: "Butter", detail: "unsalted European-style", category: "Dairy & Cold" },
+          { amount: "6", unit: "cloves", name: "Garlic", detail: "finely grated or microplaned", category: "Produce" },
+          { amount: "0.5", unit: "cup", name: "Sun-Dried Tomatoes", detail: "packed in oil, drained and thinly sliced", category: "Pantry & Spices" },
+          { amount: "1", unit: "cup", name: "Heavy Cream", detail: "chilled", category: "Dairy & Cold" },
+          { amount: "3", unit: "cups", name: "Baby Spinach", detail: "washed and dried thoroughly", category: "Produce" },
+          { amount: "0.5", unit: "cup", name: "Parmigiano-Reggiano", detail: "freshly microplaned", category: "Dairy & Cold" }
         ],
         instructions: [
-          "Liberally season the salmon fillets on both sides with flaky sea salt and cracked peppercorn.",
-          "Heat olive oil in a heavy cast-iron skillet over medium-high heat until shimmering. Sear salmon skin-side up for 4 minutes until a deep golden crust forms; flip and baste with butter for another 3 minutes. Rest on a warm board.",
-          "In the residual fats, sauté grated garlic and sun-dried tomatoes for 60 seconds until deeply fragrant.",
+          "Season salmon fillets on both sides with flaky sea salt and cracked pepper.",
+          "Heat olive oil in a heavy cast-iron skillet over medium-high heat until shimmering. Sear salmon skin-side up for 4 minutes until a deep golden crust forms; flip and baste with butter for another 3 minutes. Rest on a warm plate.",
+          "In the pan drippings, sauté grated garlic and sliced sun-dried tomatoes for 60 seconds until fragrant.",
           "Pour in heavy cream, bring to an easy simmer, then whisk in Parmigiano-Reggiano until lustrous and smooth.",
-          "Wilt the tender spinach into the cream, return fillets to bathe in sauce, and scatter torn fresh basil on top."
+          "Wilt baby spinach into the cream bath, return fillets to warm through, and serve immediately."
         ],
         createdAt: 1714500000000
       },
       {
-        id: "rec_creamy_polenta_mushrooms",
-        title: "Creamy Polenta with Brown Butter Wild Mushroom Ragù",
-        description: "Stoneground golden polenta cooked slow with pecorino and sweet butter, crowned with caramelized cremini, shiitake, and rosemary glazed in red wine.",
-        prepTime: 15,
-        cookTime: 25,
-        servings: 4,
-        tags: ["Gluten-Free", "Entertaining", "Weeknight"],
-        imageUrl: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?auto=format&fit=crop&w=1000&q=80",
-        ratings: {
-          taste: 5,
-          ease: 4,
-          presentation: 5,
-          leftovers: 5
-        },
-        tweaks: "Stir in 1 generous tablespoon of mascarpone cheese right at the end for an ethereal silk texture. Sauté mushrooms in screaming hot pan without moving them for 4 minutes to guarantee deep browning.",
-        ingredients: [
-          { amount: "1", unit: "cup", name: "Coarse Yellow Stoneground Polenta", category: "Pantry & Spices" },
-          { amount: "4", unit: "cups", name: "Simmered Vegetable Broth", category: "Pantry & Spices" },
-          { amount: "3", unit: "tbsp", name: "Salted Butter", category: "Dairy & Cold" },
-          { amount: "0.5", unit: "cup", name: "Pecorino Romano, aged", category: "Dairy & Cold" },
-          { amount: "1", unit: "lb", name: "Wild Chanterelles & Cremini Mushrooms", category: "Produce" },
-          { amount: "2", unit: "whole", name: "French Shallots, thinly shaved", category: "Produce" },
-          { amount: "1", unit: "tbsp", name: "Fresh Rosemary, minced", category: "Produce" },
-          { amount: "0.25", unit: "cup", name: "Dry Red Wine (Pinot Noir)", category: "Pantry & Spices" }
-        ],
-        instructions: [
-          "Bring rich vegetable stock to a rolling boil. Stream in polenta in a steady whisper while whisking constantly to ensure no lumps.",
-          "Lower heat to bare simmer, cover, and gently cook for 25 minutes, beating with a wooden paddle occasionally. Whisk in butter and pecorino.",
-          "In a wide skillet, brown mushrooms undisturbed in hot olive oil for 4 minutes until deeply bronzed.",
-          "Fold in shallots, rosemary, salt, and deglaze with Pinot Noir, simmering down to a glossy pan syrup.",
-          "Spoon velvety warm polenta into wide stoneware bowls and spoon the earthy mushroom ragù over top."
-        ],
-        createdAt: 1714503600000
-      },
-      {
         id: "rec_sheet_pan_chicken_zaatar",
-        title: "Cast-Iron Roast Chicken Thighs with Za'atar & Charred Lemon",
-        description: "Bone-in golden chicken thighs roasted over red onion wedges and chickpeas, scented with za'atar, garlic, and caramelized lemon wheels.",
+        title: "Cast-Iron Roast Chicken Thighs with Za'atar & Lemon",
+        description: "Bone-in golden chicken thighs roasted over red onion wedges and chickpeas, scented with authentic za'atar, garlic, and caramelized lemon wheels.",
         prepTime: 15,
         cookTime: 35,
         servings: 4,
         tags: ["Sheet-Pan", "Gluten-Free", "Weeknight", "Quick Dinners"],
-        imageUrl: "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?auto=format&fit=crop&w=1000&q=80",
-        ratings: {
-          taste: 5,
-          ease: 5,
-          presentation: 4,
-          leftovers: 5
-        },
-        tweaks: "Toss chickpeas in the rendered chicken schmaltz at the 25-minute mark so they turn ultra-crispy like roasted hazelnuts. Drizzle with cold Greek yogurt and tahini before serving.",
+        imageUrl: "", // Deliberately imageless to showcase the new imageless card aesthetic!
+        ratings: { taste: 5, ease: 5, presentation: 4, leftovers: 5 },
+        tweaks: "Toss chickpeas in the rendered chicken schmaltz at the 25-minute mark so they turn ultra-crisp. Serve with garlic labneh.",
         ingredients: [
-          { amount: "6", unit: "pieces", name: "Bone-in, Skin-on Chicken Thighs", category: "Meat & Seafood" },
-          { amount: "2", unit: "tbsp", name: "Authentic Za'atar spice blend", category: "Pantry & Spices" },
-          { amount: "1", unit: "can (15 oz)", name: "Chickpeas, drained and dried", category: "Pantry & Spices" },
-          { amount: "2", unit: "medium", name: "Red Onions, cut into wedges", category: "Produce" },
-          { amount: "2", unit: "whole", name: "Lemons, one sliced into wheels, one juiced", category: "Produce" },
-          { amount: "3", unit: "tbsp", name: "Extra Virgin Olive Oil", category: "Pantry & Spices" },
-          { amount: "0.5", unit: "bunch", name: "Fresh Flat-Leaf Parsley", category: "Produce" }
+          { amount: "6", unit: "pieces", name: "Chicken Thighs", detail: "bone-in, skin-on", category: "Meat & Seafood" },
+          { amount: "4", unit: "cloves", name: "Garlic", detail: "crushed and minced", category: "Produce" },
+          { amount: "2", unit: "tbsp", name: "Olive Oil", detail: "extra virgin", category: "Pantry & Spices" },
+          { amount: "2", unit: "tbsp", name: "Za'atar Spice", detail: "toasted sumac and wild thyme blend", category: "Pantry & Spices" },
+          { amount: "1", unit: "can (15 oz)", name: "Chickpeas", detail: "rinsed, drained and dried on cloth", category: "Pantry & Spices" },
+          { amount: "2", unit: "medium", name: "Red Onions", detail: "cut into 1/2-inch rustic wedges", category: "Produce" },
+          { amount: "2", unit: "whole", name: "Lemons", detail: "one sliced into 1/4-inch wheels, one juiced", category: "Produce" }
         ],
         instructions: [
-          "Preheat cast-iron skillet or heavy sheet pan in a 425°F oven.",
-          "Toss chicken thighs with olive oil, lemon juice, half the za'atar, coarse sea salt, and black pepper.",
-          "Scatter onion wedges and dried chickpeas across the blazing hot pan; nestle chicken thighs on top with lemon slices interspersed.",
-          "Roast for 35-38 minutes until thighs register 175°F and skin is blistered golden brown.",
-          "Garnish with chopped parsley and remaining za'atar straight from the hearth."
+          "Preheat heavy cast-iron skillet or rimmed baking sheet in a 425°F oven.",
+          "Toss chicken thighs with olive oil, minced garlic, lemon juice, half the za'atar, and coarse salt.",
+          "Scatter red onion wedges and dried chickpeas across the blazing hot skillet; nestle chicken thighs on top.",
+          "Roast for 35 minutes until skin is deeply blistered and internal temperature registers 175°F.",
+          "Dust with remaining za'atar straight from the hearth."
         ],
         createdAt: 1714507200000
+      },
+      {
+        id: "rec_cardamom_morning_buns",
+        title: "Brown Butter & Cardamom Morning Buns",
+        description: "Laminated flaky brioche spirals brushed with nutty browned butter, freshly crushed green cardamom pods, and coarse Demerara sugar crystals.",
+        prepTime: 30,
+        cookTime: 25,
+        servings: 12,
+        tags: ["Baked Goods", "Bakery & Other", "Entertaining"],
+        imageUrl: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1000&q=80",
+        ratings: { taste: 5, ease: 3, presentation: 5, leftovers: 5 },
+        tweaks: "Toast and crack fresh green cardamom pods in a granite mortar rather than using pre-ground powder for electrifying aroma.",
+        ingredients: [
+          { amount: "3.5", unit: "cups", name: "All-Purpose Flour", detail: "unbleached king arthur", category: "Bakery & Other" },
+          { amount: "0.5", unit: "cup", name: "Butter", detail: "browned until nutty and cooled slightly", category: "Dairy & Cold" },
+          { amount: "1", unit: "tbsp", name: "Green Cardamom", detail: "freshly cracked and ground", category: "Pantry & Spices" },
+          { amount: "0.75", unit: "cup", name: "Turbinado Sugar", detail: "coarse crystal sugar for coating", category: "Bakery & Other" },
+          { amount: "1", unit: "packet", name: "Active Dry Yeast", detail: "bloomed in warm milk", category: "Bakery & Other" }
+        ],
+        instructions: [
+          "Knead a silky enriched brioche dough and proof at room temperature until doubled.",
+          "Roll out into a wide rectangle, brush lavishly with browned butter, and coat with cardamom-sugar mixture.",
+          "Roll into a tight spiral cylinder, slice into 12 buns, and nestle into buttered muffin cups.",
+          "Bake at 375°F for 22-25 minutes until deep copper bronze. Roll immediately in cardamom sugar while blazing hot."
+        ],
+        createdAt: 1714510800000
       }
     ];
 
@@ -790,6 +810,7 @@
     let state = {
       recipes: [],
       planner: {},
+      weeklyBakes: [],
       customItems: [],
       checkedShoppingItems: new Set(),
       activeTab: 'database',
@@ -830,10 +851,20 @@
             state.planner[row.day] = row.meals || [];
           });
         } else {
-          state.planner["Monday"] = [{ mealId: "m1", slot: "Dinner", recipeId: "rec_tuscan_salmon" }];
-          state.planner["Wednesday"] = [{ mealId: "m2", slot: "Dinner", recipeId: "rec_sheet_pan_chicken_zaatar" }];
-          state.planner["Friday"] = [{ mealId: "m3", slot: "Dinner", recipeId: "rec_creamy_polenta_mushrooms" }];
+          // Default initial week plan showing multi-day leftovers
+          state.planner["Tuesday"] = [{ mealId: "m_tue", slot: "Dinner", recipeId: "rec_tuscan_salmon", isLeftover: false }];
+          state.planner["Wednesday"] = [{ mealId: "m_wed", slot: "Dinner", recipeId: "rec_tuscan_salmon", isLeftover: true }];
+          state.planner["Thursday"] = [{ mealId: "m_thu", slot: "Dinner", recipeId: "rec_sheet_pan_chicken_zaatar", isLeftover: false }];
           await syncPlannerToDB();
+        }
+
+        const storedBakes = await dbGetAll('weekly_bakes');
+        if (storedBakes && storedBakes.length > 0) {
+          state.weeklyBakes = storedBakes;
+        } else {
+          const defaultBake = { id: 'bake_1', recipeId: 'rec_cardamom_morning_buns', addedAt: Date.now() };
+          await dbPut('weekly_bakes', defaultBake);
+          state.weeklyBakes = [defaultBake];
         }
 
         const customRows = await dbGetAll('shopping_custom');
@@ -851,6 +882,14 @@
     async function syncPlannerToDB() {
       for (const day of DAYS_OF_WEEK) {
         await dbPut('planner', { day: day, meals: state.planner[day] || [] });
+      }
+      updateBadges();
+    }
+
+    async function syncWeeklyBakesToDB() {
+      await dbClear('weekly_bakes');
+      for (const b of state.weeklyBakes) {
+        await dbPut('weekly_bakes', b);
       }
       updateBadges();
     }
@@ -893,14 +932,14 @@
       }
     });
 
-    // JSON Export for GitHub Pages
     async function exportDataBackup() {
       const backup = {
         app: "SavorAndThyme",
-        version: "2.0",
+        version: "2.5",
         exportedAt: new Date().toISOString(),
         recipes: state.recipes,
         planner: state.planner,
+        weeklyBakes: state.weeklyBakes,
         customItems: state.customItems
       };
 
@@ -917,7 +956,6 @@
       showToast("Heirloom archive downloaded as JSON!");
     }
 
-    // JSON Restore
     async function importDataBackup(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -936,6 +974,11 @@
             if (data.planner) {
               state.planner = data.planner;
               await syncPlannerToDB();
+            }
+
+            if (data.weeklyBakes) {
+              state.weeklyBakes = data.weeklyBakes;
+              await syncWeeklyBakesToDB();
             }
 
             if (data.customItems) {
@@ -974,6 +1017,7 @@
       
       let totalPlannedMeals = 0;
       Object.values(state.planner).forEach(meals => totalPlannedMeals += meals.length);
+      totalPlannedMeals += (state.weeklyBakes || []).length;
       document.getElementById('badge-plan-count').innerText = totalPlannedMeals;
 
       const aggregated = getAggregatedShoppingList();
@@ -984,11 +1028,11 @@
     }
 
     /* =====================================================================
-       RECIPES ARCHIVE (VIEW 1)
+       RECIPES ARCHIVE (VIEW 1) - WITH ELEGANT IMAGELESS SUPPORT
        ===================================================================== */
     function renderTagFilters() {
       const container = document.getElementById('tag-filter-container');
-      const allTags = new Set(["All", "Quick Dinners", "Weeknight", "Sheet-Pan", "Gluten-Free", "Cast Iron", "Entertaining"]);
+      const allTags = new Set(["All", "Quick Dinners", "Weeknight", "Sheet-Pan", "Gluten-Free", "Cast Iron", "Entertaining", "Baked Goods"]);
       state.recipes.forEach(r => {
         if (r.tags) r.tags.forEach(t => allTags.add(t));
       });
@@ -1040,7 +1084,7 @@
           const titleMatch = r.title.toLowerCase().includes(state.searchQuery);
           const descMatch = (r.description || '').toLowerCase().includes(state.searchQuery);
           const tweakMatch = (r.tweaks || '').toLowerCase().includes(state.searchQuery);
-          const ingMatch = r.ingredients && r.ingredients.some(i => i.name.toLowerCase().includes(state.searchQuery));
+          const ingMatch = r.ingredients && r.ingredients.some(i => i.name.toLowerCase().includes(state.searchQuery) || (i.detail && i.detail.toLowerCase().includes(state.searchQuery)));
           if (!titleMatch && !descMatch && !tweakMatch && !ingMatch) return false;
         }
         return true;
@@ -1067,35 +1111,52 @@
       grid.innerHTML = list.map(recipe => {
         const overall = calculateOverallRating(recipe.ratings);
         const totalTime = (recipe.prepTime || 0) + (recipe.cookTime || 0);
-        const img = recipe.imageUrl || 'https://images.unsplash.com/photo-1546549032-9571cd6b27df?auto=format&fit=crop&w=800&q=80';
+        const hasPhoto = Boolean(recipe.imageUrl && recipe.imageUrl.trim().length > 0);
 
         return `
           <div class="group bg-parchment-50 paper-deckled rounded-3xl overflow-hidden shadow-paper hover:shadow-floating transition-all duration-300 flex flex-col justify-between">
             <div>
-              <!-- Food Image with Editorial Badge -->
-              <div class="relative aspect-16/10 overflow-hidden bg-botanical-950 cursor-pointer" onclick="openRecipeDetailModal('${recipe.id}')">
-                <img src="${img}" alt="${recipe.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-95" onerror="this.src='https://placehold.co/600x400/233426/dfc27d?text=Heirloom+Dish'">
-                <div class="absolute inset-0 bg-gradient-to-t from-charcoal-900/60 via-transparent to-transparent"></div>
-                
-                <!-- Overall Score Badge -->
-                <div class="absolute top-3.5 right-3.5 bg-botanical-900/90 border border-brass-500/40 text-brass-400 px-3 py-1 rounded-full text-xs font-mono font-bold flex items-center gap-1.5 shadow-md backdrop-blur-xs">
-                  <i data-lucide="star" class="w-3.5 h-3.5 fill-brass-500 text-brass-400"></i>
-                  <span>${overall.toFixed(1)}</span>
-                </div>
+              ${hasPhoto ? `
+                <!-- Food Image Banner (Only if photo uploaded) -->
+                <div class="relative aspect-16/10 overflow-hidden bg-botanical-950 cursor-pointer" onclick="openRecipeDetailModal('${recipe.id}')">
+                  <img src="${recipe.imageUrl}" alt="${recipe.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-95">
+                  <div class="absolute inset-0 bg-gradient-to-t from-charcoal-900/60 via-transparent to-transparent"></div>
+                  
+                  <div class="absolute top-3.5 right-3.5 bg-botanical-900/90 border border-brass-500/40 text-brass-400 px-3 py-1 rounded-full text-xs font-mono font-bold flex items-center gap-1.5 shadow-md backdrop-blur-xs">
+                    <i data-lucide="star" class="w-3.5 h-3.5 fill-brass-500 text-brass-400"></i>
+                    <span>${overall.toFixed(1)}</span>
+                  </div>
 
-                <!-- Tags on card -->
-                <div class="absolute bottom-3 left-3.5 flex flex-wrap gap-1.5">
-                  ${(recipe.tags || []).slice(0, 2).map(t => `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider font-semibold bg-charcoal-900/80 backdrop-blur-md text-parchment-100 border border-white/10">${t}</span>`).join('')}
+                  <div class="absolute bottom-3 left-3.5 flex flex-wrap gap-1.5">
+                    ${(recipe.tags || []).slice(0, 2).map(t => `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider font-semibold bg-charcoal-900/80 backdrop-blur-md text-parchment-100 border border-white/10">${t}</span>`).join('')}
+                  </div>
                 </div>
-              </div>
+              ` : `
+                <!-- Imageless Card Header: Elegant Handcrafted Typographic Ribbon -->
+                <div class="p-6 pb-2 border-b border-parchment-200/80 bg-gradient-to-b from-parchment-200/40 to-transparent">
+                  <div class="flex items-center justify-between gap-2 mb-2">
+                    <div class="flex items-center gap-1.5">
+                      <span class="w-2.5 h-2.5 rounded-full bg-brass-500"></span>
+                      <span class="text-[10px] font-mono uppercase tracking-widest text-charcoal-800/60 font-bold">Heirloom Folio</span>
+                    </div>
+                    <div class="bg-botanical-900 text-brass-400 px-2.5 py-0.5 rounded-full text-xs font-mono font-bold flex items-center gap-1 shadow-xs border border-brass-500/30">
+                      <i data-lucide="star" class="w-3 h-3 fill-brass-500 text-brass-400"></i>
+                      <span>${overall.toFixed(1)}</span>
+                    </div>
+                  </div>
+                  <div class="flex flex-wrap gap-1 mb-2">
+                    ${(recipe.tags || []).map(t => `<span class="px-2 py-0.5 rounded-md text-[9px] font-mono uppercase tracking-wider font-semibold bg-parchment-200 text-charcoal-800 border border-parchment-300">${t}</span>`).join('')}
+                  </div>
+                </div>
+              `}
 
               <!-- Card Core Details -->
-              <div class="p-6">
+              <div class="p-6 ${!hasPhoto ? 'pt-4' : ''}">
                 <h3 class="font-serif font-bold text-xl text-charcoal-900 group-hover:text-terracotta-600 transition-colors line-clamp-1 mb-2 cursor-pointer" onclick="openRecipeDetailModal('${recipe.id}')">${recipe.title}</h3>
                 <p class="text-xs text-charcoal-800/70 line-clamp-2 mb-4 leading-relaxed font-sans">${recipe.description || 'An unwritten culinary heirloom.'}</p>
                 
                 <!-- Sensory Matrix Pips -->
-                <div class="grid grid-cols-4 gap-1.5 py-2.5 px-3 bg-white/70 rounded-2xl border border-parchment-300 text-center mb-4">
+                <div class="grid grid-cols-4 gap-1.5 py-2 px-3 bg-white/70 rounded-2xl border border-parchment-300 text-center mb-4">
                   <div>
                     <span class="block text-[9px] uppercase tracking-widest text-charcoal-800/50 font-mono font-semibold">Taste</span>
                     <span class="text-xs font-mono font-bold text-charcoal-900">${recipe.ratings?.taste || '-'}/5</span>
@@ -1146,7 +1207,7 @@
     }
 
     /* =====================================================================
-       RECIPE DETAIL MODAL
+       RECIPE DETAIL MODAL - WITH PREP DETAILS & IMAGELESS SUPPORT
        ===================================================================== */
     function openRecipeDetailModal(recipeId) {
       const recipe = state.recipes.find(r => r.id === recipeId);
@@ -1156,25 +1217,39 @@
       const content = document.getElementById('modal-content');
       const overall = calculateOverallRating(recipe.ratings);
       const totalTime = (recipe.prepTime || 0) + (recipe.cookTime || 0);
+      const hasPhoto = Boolean(recipe.imageUrl && recipe.imageUrl.trim().length > 0);
 
       content.innerHTML = `
         <div class="relative">
-          <!-- Hero Header Image -->
-          <div class="relative h-72 sm:h-96 w-full overflow-hidden bg-botanical-950">
-            <img src="${recipe.imageUrl || 'https://images.unsplash.com/photo-1546549032-9571cd6b27df?auto=format&fit=crop&w=1200&q=80'}" alt="${recipe.title}" class="w-full h-full object-cover opacity-90">
-            <div class="absolute inset-0 bg-gradient-to-t from-charcoal-900 via-charcoal-900/40 to-transparent"></div>
-            
-            <button onclick="closeRecipeModal()" class="absolute top-4 right-4 bg-botanical-900/80 hover:bg-botanical-900 text-parchment-100 p-2.5 rounded-full border border-brass-500/40 backdrop-blur-md transition-all shadow-md">
-              <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
+          ${hasPhoto ? `
+            <!-- Hero Header Image -->
+            <div class="relative h-72 sm:h-96 w-full overflow-hidden bg-botanical-950">
+              <img src="${recipe.imageUrl}" alt="${recipe.title}" class="w-full h-full object-cover opacity-90">
+              <div class="absolute inset-0 bg-gradient-to-t from-charcoal-900 via-charcoal-900/40 to-transparent"></div>
+              
+              <button onclick="closeRecipeModal()" class="absolute top-4 right-4 bg-botanical-900/80 hover:bg-botanical-900 text-parchment-100 p-2.5 rounded-full border border-brass-500/40 backdrop-blur-md transition-all shadow-md">
+                <i data-lucide="x" class="w-5 h-5"></i>
+              </button>
 
-            <div class="absolute bottom-6 left-6 right-6 text-parchment-50">
-              <div class="flex flex-wrap gap-1.5 mb-2.5">
-                ${(recipe.tags || []).map(t => `<span class="px-3 py-1 rounded-full text-[10px] font-mono uppercase tracking-widest font-semibold bg-white/15 backdrop-blur-md text-parchment-100 border border-white/20">${t}</span>`).join('')}
+              <div class="absolute bottom-6 left-6 right-6 text-parchment-50">
+                <div class="flex flex-wrap gap-1.5 mb-2.5">
+                  ${(recipe.tags || []).map(t => `<span class="px-3 py-1 rounded-full text-[10px] font-mono uppercase tracking-widest font-semibold bg-white/15 backdrop-blur-md text-parchment-100 border border-white/20">${t}</span>`).join('')}
+                </div>
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-white leading-snug">${recipe.title}</h2>
               </div>
-              <h2 class="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-white leading-snug">${recipe.title}</h2>
             </div>
-          </div>
+          ` : `
+            <!-- Imageless Editorial Folio Header -->
+            <div class="p-6 sm:p-10 pb-6 bg-botanical-900 text-parchment-50 rounded-t-3xl border-b border-brass-500/30 relative">
+              <button onclick="closeRecipeModal()" class="absolute top-6 right-6 bg-botanical-800 hover:bg-botanical-700 text-parchment-100 p-2 rounded-full border border-brass-500/30 transition-all shadow-md">
+                <i data-lucide="x" class="w-5 h-5"></i>
+              </button>
+              <div class="flex flex-wrap gap-1.5 mb-3">
+                ${(recipe.tags || []).map(t => `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-widest font-semibold bg-white/10 text-brass-300 border border-brass-500/30">${t}</span>`).join('')}
+              </div>
+              <h2 class="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-white leading-snug max-w-xl">${recipe.title}</h2>
+            </div>
+          `}
 
           <!-- Folio Content -->
           <div class="p-6 sm:p-10 space-y-8">
@@ -1204,7 +1279,7 @@
                 <button onclick="editRecipe('${recipe.id}')" class="px-4 py-2.5 text-xs font-semibold text-charcoal-900 bg-parchment-200 hover:bg-parchment-300 rounded-xl flex items-center gap-1.5 border border-parchment-300 transition-colors">
                   <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Edit
                 </button>
-                <button onclick="openAddToPlanModal('${recipe.id}')" class="px-5 py-2.5 text-xs font-semibold text-parchment-50 bg-botanical-800 hover:bg-botanical-700 rounded-xl shadow-md flex items-center gap-1.5 transition-colors border border-brass-500/30">
+                <button onclick="closeRecipeModal(); openAddToPlanModal('${recipe.id}')" class="px-5 py-2.5 text-xs font-semibold text-parchment-50 bg-botanical-800 hover:bg-botanical-700 rounded-xl shadow-md flex items-center gap-1.5 transition-colors border border-brass-500/30">
                   <i data-lucide="calendar-plus" class="w-4 h-4 text-brass-400"></i> Plan in Menu
                 </button>
               </div>
@@ -1271,7 +1346,7 @@
               </p>
             </div>
 
-            <!-- Two-Column Ingredients & Instructions -->
+            <!-- Two-Column Ingredients & Instructions (With Preparation Details) -->
             <div class="grid grid-cols-1 md:grid-cols-5 gap-8 pt-2">
               <!-- Ingredients (2 cols) -->
               <div class="md:col-span-2 space-y-4">
@@ -1279,11 +1354,14 @@
                   <i data-lucide="scale" class="w-4 h-4 text-terracotta-600"></i>
                   Larder &amp; Ingredients
                 </h4>
-                <ul class="space-y-2.5 text-sm">
+                <ul class="space-y-3 text-sm">
                   ${(recipe.ingredients || []).map(ing => `
-                    <li class="flex items-baseline justify-between gap-3 py-1 border-b border-parchment-200">
-                      <span class="font-medium text-charcoal-900">${ing.name}</span>
-                      <span class="text-xs font-mono text-terracotta-600 font-semibold shrink-0">${ing.amount} ${ing.unit || ''}</span>
+                    <li class="pb-2 border-b border-parchment-200">
+                      <div class="flex items-baseline justify-between gap-3">
+                        <span class="font-semibold text-charcoal-900">${ing.name}</span>
+                        <span class="text-xs font-mono text-terracotta-600 font-bold shrink-0">${ing.amount} ${ing.unit || ''}</span>
+                      </div>
+                      ${ing.detail ? `<span class="block text-xs font-serif italic text-charcoal-800/70 mt-0.5">&bull; ${ing.detail}</span>` : ''}
                     </li>
                   `).join('')}
                 </ul>
@@ -1353,7 +1431,7 @@
     }
 
     /* =====================================================================
-       COOKBOOK STUDIO (VIEW 2)
+       COOKBOOK STUDIO (VIEW 2) - WITH EXPLICIT PREPARATION DETAIL FIELDS
        ===================================================================== */
     function openNewRecipeForm() {
       document.getElementById('form-recipe-id').value = '';
@@ -1368,9 +1446,9 @@
 
       const ingContainer = document.getElementById('ingredient-rows-container');
       ingContainer.innerHTML = '';
-      addIngredientRow('2', 'tbsp', 'Cold-Pressed Olive Oil', 'Pantry & Spices');
-      addIngredientRow('1', 'lb', 'Duck or Chicken Protein', 'Meat & Seafood');
-      addIngredientRow('3', 'cloves', 'Garlic, thinly sliced', 'Produce');
+      addIngredientRow('4', 'fillets', 'Salmon', 'skin scored, pin bones removed', 'Meat & Seafood');
+      addIngredientRow('6', 'cloves', 'Garlic', 'microplaned finely', 'Produce');
+      addIngredientRow('2', 'tbsp', 'Butter', 'cold, unsalted cubes', 'Dairy & Cold');
 
       const stepContainer = document.getElementById('instruction-rows-container');
       stepContainer.innerHTML = '';
@@ -1397,7 +1475,7 @@
       document.getElementById('form-tags').value = (recipe.tags || []).join(', ');
       document.getElementById('form-tweaks').value = recipe.tweaks || '';
 
-      if (recipe.imageUrl) {
+      if (recipe.imageUrl && recipe.imageUrl.trim().length > 0) {
         document.getElementById('form-image-base64').value = recipe.imageUrl;
         document.getElementById('image-preview').src = recipe.imageUrl;
         document.getElementById('image-preview').classList.remove('hidden');
@@ -1418,7 +1496,7 @@
       const ingContainer = document.getElementById('ingredient-rows-container');
       ingContainer.innerHTML = '';
       if (recipe.ingredients && recipe.ingredients.length > 0) {
-        recipe.ingredients.forEach(i => addIngredientRow(i.amount, i.unit, i.name, i.category));
+        recipe.ingredients.forEach(i => addIngredientRow(i.amount, i.unit, i.name, i.detail, i.category));
       } else {
         addIngredientRow();
       }
@@ -1434,31 +1512,39 @@
       switchTab('add');
     }
 
-    function addIngredientRow(amount = '', unit = '', name = '', category = 'Produce') {
+    function addIngredientRow(amount = '', unit = '', name = '', detail = '', category = 'Produce') {
       const container = document.getElementById('ingredient-rows-container');
       const div = document.createElement('div');
-      div.className = "ingredient-row grid grid-cols-12 gap-2 items-center bg-white p-2.5 rounded-xl border border-parchment-300 shadow-2xs";
+      div.className = "ingredient-row grid grid-cols-12 gap-2 items-center bg-white p-3 rounded-2xl border border-parchment-300 shadow-2xs";
       div.innerHTML = `
         <div class="col-span-3 sm:col-span-2">
-          <input type="text" placeholder="Qty" value="${amount}" class="ing-amount w-full px-2.5 py-1.5 text-xs bg-parchment-50 border border-parchment-300 rounded-lg focus:ring-1 focus:ring-botanical-700">
+          <label class="block text-[9px] font-mono uppercase text-charcoal-800/60 mb-0.5">Qty</label>
+          <input type="text" placeholder="e.g. 4" value="${amount}" class="ing-amount w-full px-2.5 py-1.5 text-xs bg-parchment-50 border border-parchment-300 rounded-lg focus:ring-1 focus:ring-botanical-700">
         </div>
         <div class="col-span-3 sm:col-span-2">
-          <input type="text" placeholder="Unit (tbsp, oz)" value="${unit}" class="ing-unit w-full px-2.5 py-1.5 text-xs bg-parchment-50 border border-parchment-300 rounded-lg focus:ring-1 focus:ring-botanical-700">
+          <label class="block text-[9px] font-mono uppercase text-charcoal-800/60 mb-0.5">Unit</label>
+          <input type="text" placeholder="cloves, tbsp" value="${unit}" class="ing-unit w-full px-2.5 py-1.5 text-xs bg-parchment-50 border border-parchment-300 rounded-lg focus:ring-1 focus:ring-botanical-700">
         </div>
-        <div class="col-span-6 sm:col-span-4">
-          <input type="text" placeholder="Ingredient name *" value="${name}" required class="ing-name w-full px-2.5 py-1.5 text-xs bg-parchment-50 border border-parchment-300 rounded-lg focus:ring-1 focus:ring-botanical-700 font-medium">
+        <div class="col-span-6 sm:col-span-3">
+          <label class="block text-[9px] font-mono uppercase text-charcoal-800/60 mb-0.5 font-bold">Ingredient Name *</label>
+          <input type="text" placeholder="e.g. Garlic, Salmon" value="${name}" required class="ing-name w-full px-2.5 py-1.5 text-xs bg-parchment-50 border border-parchment-300 rounded-lg focus:ring-1 focus:ring-botanical-700 font-semibold">
         </div>
-        <div class="col-span-10 sm:col-span-3">
-          <select class="ing-category w-full px-2 py-1.5 text-xs bg-parchment-50 border border-parchment-300 rounded-lg text-charcoal-900 font-medium">
-            <option value="Produce" ${category === 'Produce' ? 'selected' : ''}>Produce 🥬</option>
-            <option value="Meat & Seafood" ${category === 'Meat & Seafood' ? 'selected' : ''}>Meat & Seafood 🥩</option>
-            <option value="Dairy & Cold" ${category === 'Dairy & Cold' ? 'selected' : ''}>Dairy & Cold 🧀</option>
-            <option value="Pantry & Spices" ${category === 'Pantry & Spices' ? 'selected' : ''}>Pantry & Spices 🧂</option>
-            <option value="Bakery & Other" ${category === 'Bakery & Other' ? 'selected' : ''}>Bakery & Other 🍞</option>
+        <div class="col-span-7 sm:col-span-3">
+          <label class="block text-[9px] font-mono uppercase text-terracotta-600 mb-0.5 font-bold">Preparation / Detail</label>
+          <input type="text" placeholder="e.g. finely grated, skin scored" value="${detail || ''}" class="ing-detail w-full px-2.5 py-1.5 text-xs bg-parchment-50 border border-brass-500/30 rounded-lg focus:ring-1 focus:ring-botanical-700 italic font-serif">
+        </div>
+        <div class="col-span-4 sm:col-span-2">
+          <label class="block text-[9px] font-mono uppercase text-charcoal-800/60 mb-0.5">Aisle</label>
+          <select class="ing-category w-full px-1.5 py-1.5 text-xs bg-parchment-50 border border-parchment-300 rounded-lg text-charcoal-900 font-medium">
+            <option value="Produce" ${category === 'Produce' ? 'selected' : ''}>Produce</option>
+            <option value="Meat & Seafood" ${category === 'Meat & Seafood' ? 'selected' : ''}>Meat</option>
+            <option value="Dairy & Cold" ${category === 'Dairy & Cold' ? 'selected' : ''}>Dairy</option>
+            <option value="Pantry & Spices" ${category === 'Pantry & Spices' ? 'selected' : ''}>Pantry</option>
+            <option value="Bakery & Other" ${category === 'Bakery & Other' ? 'selected' : ''}>Bakery</option>
           </select>
         </div>
-        <div class="col-span-2 sm:col-span-1 text-right">
-          <button type="button" onclick="this.closest('.ingredient-row').remove()" class="text-charcoal-800/40 hover:text-rose-600 p-1.5 rounded-lg hover:bg-parchment-100 transition-colors">
+        <div class="col-span-1 text-right pt-4">
+          <button type="button" onclick="this.closest('.ingredient-row').remove()" class="text-charcoal-800/40 hover:text-rose-600 p-1 rounded-lg hover:bg-parchment-100 transition-colors">
             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
           </button>
         </div>
@@ -1491,7 +1577,6 @@
       });
     }
 
-    // Photo Compression to prevent quota errors
     function handleImageFileSelect(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -1598,7 +1683,9 @@
       const tagsRaw = document.getElementById('form-tags').value;
       const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
       const tweaks = document.getElementById('form-tweaks').value.trim();
-      const imageUrl = document.getElementById('form-image-base64').value || 'https://images.unsplash.com/photo-1546549032-9571cd6b27df?auto=format&fit=crop&w=1000&q=80';
+      
+      // If no photo was uploaded, keep strictly empty string (NO default stock photos)
+      const imageUrl = document.getElementById('form-image-base64').value || '';
 
       const ingredientRows = document.querySelectorAll('#ingredient-rows-container .ingredient-row');
       const ingredients = [];
@@ -1609,6 +1696,7 @@
             amount: row.querySelector('.ing-amount').value.trim(),
             unit: row.querySelector('.ing-unit').value.trim(),
             name: name,
+            detail: row.querySelector('.ing-detail').value.trim(),
             category: row.querySelector('.ing-category').value
           });
         }
@@ -1663,15 +1751,22 @@
       });
       await syncPlannerToDB();
 
+      state.weeklyBakes = state.weeklyBakes.filter(b => b.recipeId !== recipeId);
+      await syncWeeklyBakesToDB();
+
       closeRecipeModal();
       showToast("Recipe expunged.");
       renderAll();
     }
 
     /* =====================================================================
-       WEEKLY MENU PLANNER (VIEW 3)
+       WEEKLY MENU PLANNER & BAKED GOODS SECTION (VIEW 3)
        ===================================================================== */
     function renderPlanner() {
+      // 1. Render Dedicated Weekly Bakes Shelf
+      renderWeeklyBakesShelf();
+
+      // 2. Render 7 Days
       const grid = document.getElementById('planner-days-grid');
       let html = '';
 
@@ -1701,11 +1796,23 @@
                 const recipe = state.recipes.find(r => r.id === meal.recipeId);
                 if (!recipe) return '';
 
+                const isLeftover = Boolean(meal.isLeftover);
+                const hasPhoto = Boolean(recipe.imageUrl && recipe.imageUrl.trim().length > 0);
+
                 return `
-                  <div class="group relative bg-white hover:bg-parchment-100 rounded-xl border border-parchment-300 p-2 shadow-2xs transition-all flex items-center gap-2">
-                    <img src="${recipe.imageUrl || 'https://images.unsplash.com/photo-1546549032-9571cd6b27df?auto=format&fit=crop&w=200&q=80'}" alt="${recipe.title}" class="w-9 h-9 rounded-lg object-cover shrink-0">
+                  <div class="group relative bg-white hover:bg-parchment-100 rounded-xl border ${isLeftover ? 'border-dashed border-brass-500/80 bg-parchment-100/40' : 'border-parchment-300'} p-2 shadow-2xs transition-all flex items-center gap-2">
+                    ${hasPhoto ? `
+                      <img src="${recipe.imageUrl}" alt="${recipe.title}" class="w-9 h-9 rounded-lg object-cover shrink-0">
+                    ` : `
+                      <div class="w-9 h-9 rounded-lg bg-botanical-900/10 text-botanical-800 flex items-center justify-center font-serif font-bold text-xs shrink-0 border border-parchment-300">
+                        ${recipe.title.charAt(0)}
+                      </div>
+                    `}
                     <div class="flex-1 min-w-0 cursor-pointer" onclick="openRecipeDetailModal('${recipe.id}')">
-                      <span class="text-[8px] font-mono font-bold uppercase tracking-wider text-terracotta-600 block">${meal.slot || 'Dinner'}</span>
+                      <div class="flex items-center gap-1.5">
+                        <span class="text-[8px] font-mono font-bold uppercase tracking-wider text-terracotta-600 block">${meal.slot || 'Dinner'}</span>
+                        ${isLeftover ? '<span class="text-[8px] font-mono uppercase px-1 py-0.2 rounded-sm bg-brass-500/20 text-brass-600 font-bold border border-brass-500/30">Leftovers</span>' : ''}
+                      </div>
                       <p class="text-xs font-serif font-bold text-charcoal-900 truncate hover:text-terracotta-600 transition-colors">${recipe.title}</p>
                     </div>
                     <button onclick="removeMealFromPlanner('${day}', '${meal.mealId}')" title="Remove dish" class="text-charcoal-800/40 hover:text-rose-600 p-1 rounded-md transition-opacity">
@@ -1731,6 +1838,76 @@
       lucide.createIcons();
     }
 
+    function renderWeeklyBakesShelf() {
+      const container = document.getElementById('weekly-baked-goods-container');
+      const selectElem = document.getElementById('quick-add-baked-select');
+
+      // Populate bake dropdown selector with all recipes
+      selectElem.innerHTML = `<option value="">+ Add Weekly Bake / Treat...</option>` + 
+        state.recipes.map(r => `<option value="${r.id}">${r.title}</option>`).join('');
+
+      if (!state.weeklyBakes || state.weeklyBakes.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full py-6 text-center text-charcoal-800/50 bg-white/70 rounded-2xl border border-dashed border-parchment-300">
+            <p class="text-xs font-serif italic">No weekly confections or hearth bakes planned yet. Select sourdough loaves, pies, or muffins above!</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = state.weeklyBakes.map(bake => {
+        const recipe = state.recipes.find(r => r.id === bake.recipeId);
+        if (!recipe) return '';
+
+        const hasPhoto = Boolean(recipe.imageUrl && recipe.imageUrl.trim().length > 0);
+
+        return `
+          <div class="bg-white rounded-2xl p-3 border border-brass-500/40 shadow-2xs flex items-center justify-between gap-3 group hover:border-terracotta-500 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0 cursor-pointer" onclick="openRecipeDetailModal('${recipe.id}')">
+              ${hasPhoto ? `
+                <img src="${recipe.imageUrl}" alt="${recipe.title}" class="w-10 h-10 rounded-xl object-cover shrink-0">
+              ` : `
+                <div class="w-10 h-10 rounded-xl bg-brass-500/20 text-brass-600 flex items-center justify-center font-serif font-bold text-sm shrink-0 border border-brass-500/30">
+                  🍞
+                </div>
+              `}
+              <div class="min-w-0">
+                <span class="text-[9px] font-mono uppercase tracking-widest text-brass-600 font-bold block">Bake of the Week</span>
+                <p class="text-xs font-serif font-bold text-charcoal-900 truncate group-hover:text-terracotta-600 transition-colors">${recipe.title}</p>
+              </div>
+            </div>
+            <button onclick="removeWeeklyBake('${bake.id}')" title="Remove bake" class="text-charcoal-800/40 hover:text-rose-600 p-1.5 rounded-lg hover:bg-parchment-100 transition-colors">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function handleBakedGoodSelect(selectElem) {
+      const recipeId = selectElem.value;
+      if (!recipeId) return;
+
+      const newBake = {
+        id: 'bake_' + Date.now(),
+        recipeId: recipeId,
+        addedAt: Date.now()
+      };
+
+      state.weeklyBakes.push(newBake);
+      await syncWeeklyBakesToDB();
+      selectElem.value = '';
+      renderPlanner();
+      showToast("Added to Weekly Bakes & Treats!");
+    }
+
+    async function removeWeeklyBake(bakeId) {
+      state.weeklyBakes = state.weeklyBakes.filter(b => b.id !== bakeId);
+      await syncWeeklyBakesToDB();
+      renderPlanner();
+      showToast("Weekly bake removed.");
+    }
+
     async function handleDaySelectAdd(day, selectElem) {
       const recipeId = selectElem.value;
       if (!recipeId) return;
@@ -1738,7 +1915,8 @@
       const newMeal = {
         mealId: 'm_' + Date.now() + Math.random().toString(36).substring(2, 5),
         slot: 'Dinner',
-        recipeId: recipeId
+        recipeId: recipeId,
+        isLeftover: false
       };
 
       if (!state.planner[day]) state.planner[day] = [];
@@ -1759,47 +1937,124 @@
     }
 
     async function clearWeeklyPlan() {
-      if (!confirm("Clear all scheduled dishes for this week?")) return;
+      if (!confirm("Clear all scheduled daily meals and weekly bakes?")) return;
       DAYS_OF_WEEK.forEach(day => state.planner[day] = []);
+      state.weeklyBakes = [];
       await syncPlannerToDB();
+      await syncWeeklyBakesToDB();
       renderPlanner();
-      showToast("Weekly menu cleared.");
+      showToast("Weekly plan cleared.");
     }
 
+    /* =====================================================================
+       MULTI-DAY SCHEDULER MODAL LOGIC (COOK & LEFTOVERS)
+       ===================================================================== */
     function openAddToPlanModal(recipeId) {
       const recipe = state.recipes.find(r => r.id === recipeId);
       if (!recipe) return;
 
       document.getElementById('quick-plan-recipe-id').value = recipe.id;
       document.getElementById('quick-plan-recipe-title').innerText = recipe.title;
+
+      // Reset category to Dinner
+      const dinnerRadio = document.querySelector('input[name="plan-category"][value="Dinner"]');
+      if (dinnerRadio) dinnerRadio.checked = true;
+      togglePlanCategoryMode('daily');
+
+      // Populate the 7 day rows with Cook vs Leftover checkboxes
+      const container = document.getElementById('multi-day-selectors-container');
+      container.innerHTML = DAYS_OF_WEEK.map(day => `
+        <div class="flex items-center justify-between p-2.5 bg-white rounded-xl border border-parchment-300">
+          <label class="flex items-center gap-2.5 cursor-pointer">
+            <input type="checkbox" name="plan-day-select" value="${day}" onchange="toggleDayLeftoverControls('${day}', this.checked)" class="w-4 h-4 rounded text-botanical-800 accent-botanical-800">
+            <span class="text-xs font-serif font-bold text-charcoal-900">${day}</span>
+          </label>
+          <div id="leftover-control-${day}" class="hidden flex items-center gap-2">
+            <select id="leftover-tag-${day}" class="text-[11px] font-mono bg-parchment-50 border border-parchment-300 rounded-lg px-2 py-1 text-charcoal-800 font-semibold">
+              <option value="cook">Fresh Cook 🔥</option>
+              <option value="leftover">Leftovers 🍲</option>
+            </select>
+          </div>
+        </div>
+      `).join('');
+
       document.getElementById('add-to-plan-modal').classList.remove('hidden');
+    }
+
+    function toggleDayLeftoverControls(day, isChecked) {
+      const ctrl = document.getElementById(`leftover-control-${day}`);
+      if (isChecked) {
+        ctrl.classList.remove('hidden');
+      } else {
+        ctrl.classList.add('hidden');
+      }
+    }
+
+    function togglePlanCategoryMode(mode) {
+      const dailyBox = document.getElementById('plan-daily-options');
+      if (mode === 'baked') {
+        dailyBox.classList.add('hidden');
+      } else {
+        dailyBox.classList.remove('hidden');
+      }
     }
 
     function closeAddToPlanModal() {
       document.getElementById('add-to-plan-modal').classList.add('hidden');
     }
 
-    async function confirmAddToPlan() {
+    async function confirmMultiDayAddToPlan() {
       const recipeId = document.getElementById('quick-plan-recipe-id').value;
-      const day = document.getElementById('quick-plan-day').value;
-      const slot = document.getElementById('quick-plan-slot').value;
+      const category = document.querySelector('input[name="plan-category"]:checked')?.value || 'Dinner';
 
-      if (!state.planner[day]) state.planner[day] = [];
-      state.planner[day].push({
-        mealId: 'm_' + Date.now(),
-        slot: slot,
-        recipeId: recipeId
+      if (category === 'Baked Goods') {
+        // Add to weekly bakes shelf
+        state.weeklyBakes.push({
+          id: 'bake_' + Date.now(),
+          recipeId: recipeId,
+          addedAt: Date.now()
+        });
+        await syncWeeklyBakesToDB();
+        closeAddToPlanModal();
+        showToast("Added to Weekly Bakes & Treats!");
+        if (state.activeTab === 'planner') renderPlanner();
+        return;
+      }
+
+      // Daily meal slot assignment (Breakfast, Lunch, Dinner across selected days)
+      const selectedDayInputs = document.querySelectorAll('input[name="plan-day-select"]:checked');
+      if (selectedDayInputs.length === 0) {
+        showToast("Please select at least one day.");
+        return;
+      }
+
+      selectedDayInputs.forEach(input => {
+        const day = input.value;
+        const tagSelect = document.getElementById(`leftover-tag-${day}`);
+        const isLeftover = tagSelect ? (tagSelect.value === 'leftover') : false;
+
+        if (!state.planner[day]) state.planner[day] = [];
+        state.planner[day].push({
+          mealId: 'm_' + Date.now() + Math.random().toString(36).substring(2, 6),
+          slot: category,
+          recipeId: recipeId,
+          isLeftover: isLeftover
+        });
       });
 
       await syncPlannerToDB();
       closeAddToPlanModal();
-      showToast(`Scheduled for ${day}!`);
+      showToast(`Scheduled across ${selectedDayInputs.length} day(s)!`);
       if (state.activeTab === 'planner') renderPlanner();
     }
 
     /* =====================================================================
-       MARKET BASKET (VIEW 4)
+       MARKET BASKET: SMART INGREDIENT AGGREGATION & BREAKDOWN (VIEW 4)
        ===================================================================== */
+    function normalizeIngredientName(name) {
+      return (name || '').trim().toLowerCase().replace(/s$/, ''); // Basic singularization for clean match
+    }
+
     function getAggregatedShoppingList() {
       const categoryMap = {
         'Produce': [],
@@ -1809,49 +2064,89 @@
         'Bakery & Other': []
       };
 
+      // Helper function to process an ingredient instance into consolidated map
+      function processIngredient(item, recipeTitle) {
+        const cat = item.category || 'Pantry & Spices';
+        if (!categoryMap[cat]) categoryMap[cat] = [];
+
+        const normalizedName = normalizeIngredientName(item.name);
+        const itemUnit = (item.unit || '').trim().toLowerCase();
+
+        // Match existing item in category by normalized name & unit
+        const existing = categoryMap[cat].find(x => 
+          normalizeIngredientName(x.name) === normalizedName &&
+          (x.unit || '').trim().toLowerCase() === itemUnit
+        );
+
+        if (existing) {
+          // Sum numerical amounts when matching units
+          const n1 = parseFloat(existing.totalAmount);
+          const n2 = parseFloat(item.amount);
+          if (!isNaN(n1) && !isNaN(n2)) {
+            existing.totalAmount = Math.round((n1 + n2) * 100) / 100;
+          } else if (item.amount) {
+            existing.totalAmount = `${existing.totalAmount} + ${item.amount}`;
+          }
+
+          // Add breakdown detail
+          existing.breakdowns.push({
+            recipeTitle: recipeTitle,
+            amount: item.amount,
+            unit: item.unit,
+            detail: item.detail
+          });
+        } else {
+          // Create consolidated entry
+          const n = parseFloat(item.amount);
+          categoryMap[cat].push({
+            id: `ing_${normalizedName.replace(/[^a-z0-9]/g, '_')}_${itemUnit}`,
+            name: item.name,
+            totalAmount: !isNaN(n) ? n : (item.amount || ''),
+            unit: item.unit || '',
+            category: cat,
+            breakdowns: [{
+              recipeTitle: recipeTitle,
+              amount: item.amount,
+              unit: item.unit,
+              detail: item.detail
+            }]
+          });
+        }
+      }
+
+      // 1. Gather ingredients from Daily Planned Meals
       DAYS_OF_WEEK.forEach(day => {
         (state.planner[day] || []).forEach(meal => {
-          const recipe = state.recipes.find(r => r.id === meal.recipeId);
-          if (recipe && recipe.ingredients) {
-            recipe.ingredients.forEach(item => {
-              const cat = item.category || 'Pantry & Spices';
-              if (!categoryMap[cat]) categoryMap[cat] = [];
-
-              const existing = categoryMap[cat].find(x => x.name.toLowerCase() === item.name.toLowerCase() && x.unit.toLowerCase() === item.unit.toLowerCase());
-              if (existing) {
-                const n1 = parseFloat(existing.amount);
-                const n2 = parseFloat(item.amount);
-                if (!isNaN(n1) && !isNaN(n2)) {
-                  existing.amount = `${Math.round((n1 + n2) * 100) / 100}`;
-                } else {
-                  existing.amount = `${existing.amount} + ${item.amount}`;
-                }
-                existing.sources.push(recipe.title);
-              } else {
-                categoryMap[cat].push({
-                  id: `ing_${item.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${item.unit}`,
-                  name: item.name,
-                  amount: item.amount,
-                  unit: item.unit,
-                  category: cat,
-                  sources: [recipe.title]
-                });
-              }
-            });
+          // Note: Leftovers use the batch already cooked on prep day!
+          // Only harvest ingredients for fresh cook days so groceries aren't duplicated unnecessarily.
+          if (!meal.isLeftover) {
+            const recipe = state.recipes.find(r => r.id === meal.recipeId);
+            if (recipe && recipe.ingredients) {
+              recipe.ingredients.forEach(item => processIngredient(item, recipe.title));
+            }
           }
         });
       });
 
+      // 2. Gather ingredients from Weekly Baked Goods & Treats
+      (state.weeklyBakes || []).forEach(bake => {
+        const recipe = state.recipes.find(r => r.id === bake.recipeId);
+        if (recipe && recipe.ingredients) {
+          recipe.ingredients.forEach(item => processIngredient(item, `${recipe.title} (Weekly Bake)`));
+        }
+      });
+
+      // 3. Add Custom Grocery Staples
       state.customItems.forEach(custom => {
         const cat = custom.category || 'Pantry & Spices';
         if (!categoryMap[cat]) categoryMap[cat] = [];
         categoryMap[cat].push({
           id: custom.id,
           name: custom.name,
-          amount: '',
+          totalAmount: '',
           unit: 'Staple',
           category: cat,
-          sources: ['Custom Item'],
+          breakdowns: [{ recipeTitle: 'Pantry Extra', amount: '', unit: '', detail: '' }],
           isCustom: true
         });
       });
@@ -1900,14 +2195,29 @@
           const isChecked = state.checkedShoppingItems.has(item.id);
           if (isChecked) checkedItems++;
 
+          // Build clean breakdowns of recipes & preparation details
+          const breakdownNotes = item.breakdowns.map(b => {
+            const prep = b.detail ? ` (${b.detail})` : '';
+            const qty = b.amount ? `${b.amount} ${b.unit || ''}` : '';
+            return `${b.recipeTitle}${prep ? ': ' + prep : ''}`;
+          }).join(' &bull; ');
+
           return `
-            <li class="flex items-start gap-3 py-2.5 px-2 rounded-xl hover:bg-parchment-100 transition-colors group">
-              <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleShoppingItem('${item.id}')" class="mt-0.5 w-4 h-4 rounded text-terracotta-600 focus:ring-terracotta-600 border-parchment-300 cursor-pointer accent-terracotta-600">
+            <li class="flex items-start gap-3 py-3 px-2 rounded-xl hover:bg-parchment-100 transition-colors group">
+              <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleShoppingItem('${item.id}')" class="mt-1 w-4 h-4 rounded text-terracotta-600 focus:ring-terracotta-600 border-parchment-300 cursor-pointer accent-terracotta-600">
               <div class="flex-1 min-w-0">
-                <span class="text-xs sm:text-sm font-medium ${isChecked ? 'line-through text-charcoal-800/40' : 'text-charcoal-900'} transition-all">${item.name}</span>
-                <div class="flex items-center gap-1.5 text-[10px] text-charcoal-800/50">
-                  ${item.amount ? `<span class="font-mono font-bold text-terracotta-600">${item.amount} ${item.unit}</span> &bull;` : ''}
-                  <span class="truncate font-serif italic">${item.sources.join(', ')}</span>
+                <div class="flex items-baseline justify-between gap-2">
+                  <span class="text-sm font-semibold ${isChecked ? 'line-through text-charcoal-800/40' : 'text-charcoal-900'} transition-all">${item.name}</span>
+                  ${item.totalAmount ? `
+                    <span class="font-mono font-bold text-xs text-terracotta-600 shrink-0 bg-parchment-200/80 px-2 py-0.5 rounded-md border border-parchment-300">
+                      ${item.totalAmount} ${item.unit}
+                    </span>
+                  ` : ''}
+                </div>
+                
+                <!-- Aggregated Recipes & Prep Notes -->
+                <div class="text-[11px] text-charcoal-800/60 font-serif italic mt-0.5 leading-snug">
+                  ${breakdownNotes}
                 </div>
               </div>
               ${item.isCustom ? `
@@ -1998,8 +2308,9 @@
       categories.forEach(cat => {
         text += `== ${cat.name.toUpperCase()} ==\n`;
         cat.items.forEach(item => {
-          const qty = item.amount ? ` (${item.amount} ${item.unit})` : '';
-          text += `[ ] ${item.name}${qty}\n`;
+          const qty = item.totalAmount ? ` (${item.totalAmount} ${item.unit})` : '';
+          const details = item.breakdowns.map(b => b.detail ? `${b.recipeTitle}: ${b.detail}` : b.recipeTitle).join('; ');
+          text += `[ ] ${item.name}${qty} — [${details}]\n`;
         });
         text += "\n";
       });
