@@ -196,7 +196,6 @@
       border-color: var(--border-strong);
     }
 
-    /* Segmented Sub-Nav Controls */
     .segmented-control {
       display: inline-flex;
       background: var(--bg-parchment);
@@ -232,7 +231,6 @@
       width: 100%;
     }
 
-    /* Views */
     .view-panel {
       display: none;
     }
@@ -246,7 +244,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Controls Bar & Clean Fixed Search */
     .controls-bar {
       display: flex;
       flex-wrap: wrap;
@@ -313,7 +310,6 @@
       cursor: pointer;
     }
 
-    /* Recipe Cards Grid */
     .recipes-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -456,7 +452,6 @@
       padding-top: 0.5rem;
     }
 
-    /* Modal Styling */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -515,7 +510,6 @@
       padding: 2rem;
     }
 
-    /* Recipe Sheet Layout */
     .recipe-folio-header {
       margin-bottom: 2rem;
       text-align: center;
@@ -536,7 +530,6 @@
       flex-wrap: wrap;
     }
 
-    /* Ratings Grid System */
     .ratings-card-panel {
       background: var(--bg-parchment);
       border: 1px solid var(--border-warm);
@@ -578,7 +571,6 @@
       font-size: 0.88rem;
     }
 
-    /* Weekend Prep Box */
     .weekend-prep-panel {
       background: #f7f9f6;
       border: 1px solid #d5dfd3;
@@ -599,7 +591,6 @@
       gap: 0.5rem;
     }
 
-    /* Chef's Tweaks Journal Entry */
     .chef-journal {
       background: #fffdfa;
       border-left: 3px solid var(--accent-terracotta);
@@ -630,7 +621,6 @@
       line-height: 1.4;
     }
 
-    /* Tasting Table / Guest Feedback */
     .guest-feedback-section {
       margin-top: 2rem;
       padding-top: 1.5rem;
@@ -691,7 +681,6 @@
       font-weight: 600;
     }
 
-    /* Ingredients & Steps Layout */
     .recipe-columns {
       display: grid;
       grid-template-columns: 1fr 1.6fr;
@@ -770,7 +759,6 @@
       line-height: 1.55;
     }
 
-    /* Form & Editor Layout */
     .form-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -868,7 +856,6 @@
     }
     .btn-remove-line:hover { color: var(--accent-terracotta); }
 
-    /* Weekly Meal Planner Styles */
     .planner-container {
       display: flex;
       flex-direction: column;
@@ -1049,7 +1036,6 @@
       color: var(--accent-forest);
     }
 
-    /* Weekend Prep Workspace View */
     .prep-workspace-sheet {
       background: var(--card-bg);
       border: 1px solid var(--border-warm);
@@ -1108,7 +1094,6 @@
       opacity: 0.7;
     }
 
-    /* Shopping Basket Styles */
     .market-basket-layout {
       display: grid;
       grid-template-columns: 2.2fr 1fr;
@@ -1199,7 +1184,6 @@
       margin-left: 0.3rem;
     }
 
-    /* Batch Document Importer Modal */
     .doc-drop-zone {
       border: 2px dashed var(--accent-brass);
       background: var(--bg-parchment);
@@ -1722,7 +1706,6 @@
 
     let recipesState = [];
     
-    // Dual Week Architecture: 'current' and 'next'
     let plannerState = {
       current: {
         bakes: [],
@@ -1734,9 +1717,9 @@
       }
     };
 
-    let activePlannerWeek = 'current'; // 'current' or 'next'
-    let activeBasketScope = 'current'; // 'current', 'next', or 'both'
-    let activePrepScope = 'current';   // 'current', 'next', or 'both'
+    let activePlannerWeek = 'current';
+    let activeBasketScope = 'current';
+    let activePrepScope = 'current';
 
     let manualStaplesState = [];
     let checkedBasketItems = {};
@@ -1770,7 +1753,6 @@
       
       const savedPlanner = await idbGet('app_state', 'weekly_planner');
       if (savedPlanner && savedPlanner.data) {
-        // Backward-compatibility check: migrate old single-week planner to current
         if (savedPlanner.data.days && !savedPlanner.data.current) {
           plannerState.current = savedPlanner.data;
           plannerState.next = {
@@ -1873,7 +1855,7 @@
     }
 
     /* ==========================================================================
-       3. RATINGS CALCULATION (Handles Unrated & Untested)
+       3. RATINGS CALCULATION
        ========================================================================== */
     function calculateCompositeScore(r) {
       if (!r || r.isUntested || !r.ratings) return null;
@@ -2043,7 +2025,6 @@
           </div>
         ` : ''}
 
-        <!-- Ratings & Scores Grid -->
         <div class="ratings-card-panel">
           <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem;">
             <h4 class="serif" style="color: var(--accent-forest); font-size: 1.1rem;">Sensory Scorecard</h4>
@@ -2090,7 +2071,6 @@
           ` : ''}
         </div>
 
-        <!-- Weekend Prep Callout -->
         ${recipe.weekendPrep ? `
           <div class="weekend-prep-panel">
             <h4>
@@ -2101,7 +2081,6 @@
           </div>
         ` : ''}
 
-        <!-- The Tasting Table / Guest Feedback -->
         ${recipe.reviews && recipe.reviews.length > 0 ? `
           <div class="guest-feedback-section">
             <div class="section-title-wrap">
@@ -2121,7 +2100,6 @@
           </div>
         ` : ''}
 
-        <!-- Ingredients and Instructions Grid -->
         <div class="recipe-columns">
           <div class="ingredients-box">
             <h3 class="serif">Provisions</h3>
@@ -2393,7 +2371,6 @@
       await idbDelete('recipes', recipeId);
       recipesState = recipesState.filter(r => r.id !== recipeId);
       
-      // Clean up both weeks
       ['current', 'next'].forEach(wk => {
         for (const day of DAYS_ORDER) {
           plannerState[wk].days[day] = plannerState[wk].days[day].filter(slot => slot.recipeId !== recipeId);
@@ -2483,14 +2460,13 @@
         });
       }
 
-      // Sync active view to whichever week was scheduled
       setPlannerActiveWeek(targetWeek);
       await persistPlanner();
       closeModal('scheduleMealModal');
       switchView('planner');
     }
 
-function renderWeeklyPlanner() {
+    function renderWeeklyPlanner() {
       const currentPlan = plannerState[activePlannerWeek] || { bakes: [], days: {} };
 
       // 1. Hearth Bakes
@@ -2541,7 +2517,8 @@ function renderWeeklyPlanner() {
                   <div class="slot-block ${slot.isLeftover ? 'is-leftover' : ''}">
                     <button class="btn-slot-delete" onclick="removeMealSlot('${activePlannerWeek}', '${day}', '${slot.instanceId}')">&times;</button>
                     <div class="slot-type-label">
-                      <span>${slot.mealType}</span>${slot.isLeftover ? '<span class="leftover-flag">🍲 Leftover</span>' : ''}
+                      <span>${slot.mealType}</span>
+                      ${slot.isLeftover ? '<span class="leftover-flag">🍲 Leftover</span>' : ''}
                     </div>
                     <div class="slot-dish-title" onclick="openRecipeFolio('${slot.recipeId}')">${title}</div>
                   </div>
@@ -2574,6 +2551,7 @@ function renderWeeklyPlanner() {
       await persistPlanner();
       renderWeeklyPlanner();
     }
+
     function promptAddDishToDay(weekKey, day) {
       if (recipesState.length === 0) {
         alert('Please add a recipe to your folio first.');
@@ -2688,7 +2666,7 @@ function renderWeeklyPlanner() {
     }
 
     /* ==========================================================================
-       9. MARKET BASKET & AGGREGATION ENGINE (MID-WEEK MULTI-WEEK SUPPORT)
+       9. MARKET BASKET & AGGREGATION ENGINE
        ========================================================================== */
     const UNIT_SYNONYMS = {
       'tbsp': 'tbsp', 'tablespoon': 'tbsp', 'tablespoons': 'tbsp', 'tbs': 'tbsp', 'T': 'tbsp',
