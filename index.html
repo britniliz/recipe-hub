@@ -33,6 +33,7 @@
       --accent-sage: #e8ede6;
       --accent-linen: #fdfaf6;
       --accent-leftover: #6f5843;
+      --accent-untested: #8c6d48;
       
       --shadow-subtle: 0 4px 15px rgba(25, 38, 28, 0.04);
       --shadow-raised: 0 10px 30px rgba(25, 38, 28, 0.08);
@@ -98,8 +99,17 @@
       color: var(--ink-primary);
     }
 
-    .logo-mark svg {
+    .logo-icon-wrap {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-parchment);
+      border: 1px solid var(--border-warm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: var(--accent-terracotta);
+      flex-shrink: 0;
     }
 
     .logo-text h1 {
@@ -119,15 +129,15 @@
     nav {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.35rem;
     }
 
     .nav-btn {
       background: none;
       border: 1px solid transparent;
-      padding: 0.5rem 0.9rem;
+      padding: 0.5rem 0.85rem;
       border-radius: var(--radius-sm);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 500;
       color: var(--ink-secondary);
       cursor: pointer;
@@ -208,7 +218,7 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Recipe Hub Controls */
+    /* Controls Bar & Clean Fixed Search */
     .controls-bar {
       display: flex;
       flex-wrap: wrap;
@@ -225,27 +235,37 @@
 
     .search-wrap {
       flex: 1;
-      min-width: 260px;
+      min-width: 280px;
       position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon-symbol {
+      position: absolute;
+      left: 1rem;
+      pointer-events: none;
+      color: var(--ink-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .search-wrap input {
       width: 100%;
-      padding: 0.6rem 0.8rem 0.6rem 2.4rem;
+      padding: 0.65rem 1rem 0.65rem 2.85rem; /* Generous indent preventing any asset overlap */
       border: 1px solid var(--border-warm);
       border-radius: var(--radius-sm);
       background: var(--bg-cream);
       font-family: inherit;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       color: var(--ink-primary);
     }
 
-    .search-wrap svg {
-      position: absolute;
-      left: 0.8rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--ink-muted);
+    .search-wrap input:focus {
+      outline: none;
+      border-color: var(--accent-forest);
+      background: #ffffff;
     }
 
     .filters-wrap {
@@ -342,6 +362,18 @@
       font-weight: 600;
     }
 
+    .badge-untested {
+      background: #faeedb;
+      color: var(--accent-untested);
+      border: 1px dashed var(--accent-ochre);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
     .recipe-card-title {
       font-size: 1.3rem;
       margin-bottom: 0.5rem;
@@ -352,7 +384,7 @@
     .ratings-summary-row {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.75rem;
       margin-bottom: 0.75rem;
       padding-bottom: 0.75rem;
       border-bottom: 1px solid var(--bg-parchment);
@@ -369,6 +401,14 @@
       font-size: 0.85rem;
       font-weight: 600;
       color: var(--accent-brass);
+    }
+
+    .score-badge.is-unrated {
+      color: var(--ink-muted);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.75rem;
+      background: var(--bg-cream);
+      border: 1px solid var(--border-warm);
     }
 
     .guest-feedback-chip {
@@ -447,7 +487,7 @@
       padding: 2rem;
     }
 
-    /* Editorial Recipe Sheet Layout */
+    /* Recipe Sheet Layout */
     .recipe-folio-header {
       margin-bottom: 2rem;
       text-align: center;
@@ -502,6 +542,33 @@
       color: var(--accent-brass);
       letter-spacing: 2px;
       font-size: 1rem;
+    }
+
+    .unrated-notice {
+      color: var(--ink-muted);
+      font-style: italic;
+      font-size: 0.88rem;
+    }
+
+    /* Weekend Prep Box */
+    .weekend-prep-panel {
+      background: #f7f9f6;
+      border: 1px solid #d5dfd3;
+      border-left: 4px solid var(--accent-forest);
+      border-radius: var(--radius-sm);
+      padding: 1.25rem;
+      margin: 1.5rem 0;
+    }
+
+    .weekend-prep-panel h4 {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-forest);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     /* Chef's Tweaks Journal Entry */
@@ -717,6 +784,28 @@
       background: #fff;
     }
 
+    .untested-toggle-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: #fff9ee;
+      border: 1px solid #ebd3b0;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 1rem;
+    }
+
+    .untested-toggle-bar label {
+      cursor: pointer;
+      font-size: 0.88rem;
+      text-transform: none;
+      font-weight: 600;
+      color: #7a5829;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
     .ingredients-builder {
       background: var(--bg-parchment);
       border: 1px solid var(--border-warm);
@@ -919,6 +1008,63 @@
       color: var(--accent-forest);
     }
 
+    /* Weekend Prep Workspace View */
+    .prep-workspace-sheet {
+      background: var(--card-bg);
+      border: 1px solid var(--border-warm);
+      border-radius: var(--radius-md);
+      padding: 2rem;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .prep-task-card {
+      background: var(--bg-cream);
+      border: 1px solid var(--border-warm);
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .prep-task-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.4rem;
+    }
+
+    .prep-dish-title {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--accent-forest);
+      cursor: pointer;
+    }
+    .prep-dish-title:hover { text-decoration: underline; }
+
+    .prep-instructions-box {
+      font-size: 0.92rem;
+      color: var(--ink-secondary);
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+
+    .prep-check-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      cursor: pointer;
+    }
+
+    .prep-check-label.checked .prep-dish-title {
+      text-decoration: line-through;
+      color: var(--ink-muted);
+    }
+
+    .prep-check-label.checked .prep-instructions-box {
+      text-decoration: line-through;
+      color: var(--ink-muted);
+      opacity: 0.7;
+    }
+
     /* Shopping Basket Styles */
     .market-basket-layout {
       display: grid;
@@ -1054,16 +1200,6 @@
       padding: 1rem;
       position: relative;
     }
-
-    /* Utilities */
-    .badge-pill {
-      font-size: 0.7rem;
-      font-weight: 600;
-      padding: 0.2rem 0.5rem;
-      border-radius: 999px;
-      background: var(--bg-parchment);
-      color: var(--ink-secondary);
-    }
   </style>
 </head>
 <body>
@@ -1072,9 +1208,15 @@
   <header>
     <div class="header-inner">
       <div class="logo-mark">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
-        </svg>
+        <div class="logo-icon-wrap">
+          <!-- Authentic Culinary Hearth & Crossed Knife/Spoon Mark -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 3v4c0 1.5-1 2.5-2.5 3L14 11v10h-2V11l-1.5-1C9 9.5 8 8.5 8 7V3"/>
+            <path d="M12 2v5"/>
+            <path d="M4 19h16"/>
+            <path d="M5 22h14"/>
+          </svg>
+        </div>
         <div class="logo-text">
           <h1>Kitchen Atelier</h1>
           <span>Recipe Folio & Provisioner</span>
@@ -1083,15 +1225,19 @@
 
       <nav>
         <button class="nav-btn active" onclick="switchView('library')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/></svg>
           Recipe Folio
         </button>
         <button class="nav-btn" onclick="switchView('planner')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
           Weekly Menu
         </button>
+        <button class="nav-btn" onclick="switchView('prep')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Weekend Prep
+        </button>
         <button class="nav-btn" onclick="switchView('basket')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 11 4-7"/><path d="m19 11-4-7"/><path d="M2 11h20"/><path d="m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8c.9 0 1.8-.7 2-1.6l1.6-7.4"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 11 4-7"/><path d="m19 11-4-7"/><path d="M2 11h20"/><path d="m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8c.9 0 1.8-.7 2-1.6l1.6-7.4"/></svg>
           Market Basket
         </button>
       </nav>
@@ -1114,12 +1260,15 @@
     <section id="view-library" class="view-panel active">
       <div class="controls-bar">
         <div class="search-wrap">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="recipeSearchInput" placeholder="Search archive by title, ingredient, tag, or notes..." oninput="filterRecipes()">
+          <div class="search-icon-symbol">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+          <input type="text" id="recipeSearchInput" placeholder="Search archive by dish title, ingredient, tag, or notes..." oninput="filterRecipes()">
         </div>
         <div class="filters-wrap">
           <select id="tagFilter" class="filter-select" onchange="filterRecipes()">
-            <option value="all">All Tags</option>
+            <option value="all">All Dishes</option>
+            <option value="untested">Untested / Haven't Made</option>
             <option value="dinner">Dinner</option>
             <option value="lunch">Lunch</option>
             <option value="breakfast">Breakfast</option>
@@ -1168,7 +1317,26 @@
       </div>
     </section>
 
-    <!-- VIEW 3: MARKET BASKET (AGGREGATED GROCERY) -->
+    <!-- VIEW 3: WEEKEND PREP WORKSPACE -->
+    <section id="view-prep" class="view-panel">
+      <div class="prep-workspace-sheet">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.5rem; border-bottom: 1.5px solid var(--border-warm); padding-bottom: 0.75rem;">
+          <div>
+            <h2 class="serif" style="font-size: 1.8rem; color: var(--accent-forest);">Weekend Prep Navigator</h2>
+            <p style="font-size: 0.88rem; color: var(--ink-muted); margin-top: 0.2rem;">
+              Batch tasks, sauces, egg bites, and advance steps for all recipes scheduled in your upcoming week.
+            </p>
+          </div>
+          <button class="btn-secondary" onclick="clearWeekendPrepChecks()">Reset Prep Checkbox List</button>
+        </div>
+
+        <div id="weekendPrepListContainer">
+          <!-- Dynamically gathered from planned meals -->
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: MARKET BASKET (AGGREGATED GROCERY) -->
     <section id="view-basket" class="view-panel">
       <div class="market-basket-layout">
         <div class="basket-sheet">
@@ -1237,10 +1405,18 @@
         <form id="recipeForm" onsubmit="saveRecipe(event)">
           <input type="hidden" id="editRecipeId">
 
+          <!-- Untested Recipe Toggle -->
+          <div class="untested-toggle-bar">
+            <label>
+              <input type="checkbox" id="formIsUntested" onchange="toggleRatingsSectionState()">
+              <strong>Haven't made this dish yet (Untested Recipe)</strong> — Keeps dish unrated until tasted
+            </label>
+          </div>
+
           <div class="form-grid">
             <div class="form-group full-width">
               <label>Recipe Title</label>
-              <input type="text" id="formTitle" required placeholder="e.g. Miso Glazed Black Cod with Charred Bok Choy">
+              <input type="text" id="formTitle" required placeholder="e.g. Mexican Beef & Sweet Potato Chili-Stew">
             </div>
 
             <div class="form-group">
@@ -1264,41 +1440,53 @@
             </div>
 
             <div class="form-group full-width">
-              <label>Photograph (Optional - card remains imageless if omitted)</label>
+              <label>Photograph (Optional - card remains clean & imageless if omitted)</label>
               <input type="file" id="formPhotoFile" accept="image/*" onchange="previewUploadImage(event)">
               <input type="hidden" id="formPhotoBase64">
               <div id="photoPreviewContainer" style="margin-top: 0.5rem;"></div>
             </div>
           </div>
 
-          <!-- Robust Multi-Dimensional Ratings System -->
-          <div class="ratings-card-panel">
+          <!-- Weekend Prep Guidance Field -->
+          <div class="form-group full-width" style="margin-bottom: 1.5rem;">
+            <label style="color: var(--accent-forest); display: flex; align-items: center; gap: 0.4rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Weekend Prep-Ahead Actions (Optional)
+            </label>
+            <textarea id="formWeekendPrep" rows="2" placeholder="e.g. Whisk marinade in advance; bake egg bites on Sunday; chop sweet potatoes into cubes and store airtight..."></textarea>
+          </div>
+
+          <!-- Robust Multi-Dimensional Ratings System (Allows Unrated state) -->
+          <div class="ratings-card-panel" id="ratingsCardPanel">
             <h4 class="serif" style="margin-bottom: 0.8rem; color: var(--accent-forest);">Scorecard & Sensory Metrics</h4>
             <div class="ratings-metrics-grid">
               <div class="metric-cell">
-                <label>Flavor / Taste (1-5)</label>
+                <label>Flavor / Taste</label>
                 <select id="ratingTaste">
+                  <option value="unrated" selected>— Not Rated Yet —</option>
                   <option value="5">★★★★★ Exceptional (5)</option>
-                  <option value="4" selected>★★★★☆ Great (4)</option>
+                  <option value="4">★★★★☆ Great (4)</option>
                   <option value="3">★★★☆☆ Satisfactory (3)</option>
                   <option value="2">★★☆☆☆ Underwhelming (2)</option>
                   <option value="1">★☆☆☆☆ Poor (1)</option>
                 </select>
               </div>
               <div class="metric-cell">
-                <label>Ease / Weeknight Speed (1-5)</label>
+                <label>Ease / Weeknight Speed</label>
                 <select id="ratingEase">
+                  <option value="unrated" selected>— Not Rated Yet —</option>
                   <option value="5">★★★★★ Effortless (5)</option>
-                  <option value="4" selected>★★★★☆ Moderate (4)</option>
+                  <option value="4">★★★★☆ Moderate (4)</option>
                   <option value="3">★★★☆☆ Laborious (3)</option>
                   <option value="2">★★☆☆☆ High Friction (2)</option>
                   <option value="1">★☆☆☆☆ Exhausting (1)</option>
                 </select>
               </div>
               <div class="metric-cell">
-                <label>Visual Presentation (1-5)</label>
+                <label>Visual Presentation</label>
                 <select id="ratingPresentation">
-                  <option value="5" selected>★★★★★ Feast for eyes (5)</option>
+                  <option value="unrated" selected>— Not Rated Yet —</option>
+                  <option value="5">★★★★★ Feast for eyes (5)</option>
                   <option value="4">★★★★☆ Plated nicely (4)</option>
                   <option value="3">★★★☆☆ Rustic / Average (3)</option>
                   <option value="2">★★☆☆☆ Messy (2)</option>
@@ -1306,10 +1494,11 @@
                 </select>
               </div>
               <div class="metric-cell">
-                <label>Leftover Longevity (1-5)</label>
+                <label>Leftover Longevity</label>
                 <select id="ratingLeftovers">
+                  <option value="unrated" selected>— Not Rated Yet —</option>
                   <option value="5">★★★★★ Better Next Day (5)</option>
-                  <option value="4" selected>★★★★☆ Holds Up Well (4)</option>
+                  <option value="4">★★★★☆ Holds Up Well (4)</option>
                   <option value="3">★★★☆☆ Acceptable (3)</option>
                   <option value="2">★★☆☆☆ Texture Degrades (2)</option>
                   <option value="1">★☆☆☆☆ Eat Immediately Only (1)</option>
@@ -1320,7 +1509,7 @@
             <!-- Chef's Tweaks Notes -->
             <div class="form-group full-width" style="margin-top: 1rem;">
               <label style="color: var(--accent-terracotta);">Chef's Margins: Tweaks for Next Time</label>
-              <textarea id="formTweaks" rows="3" placeholder="e.g. Double the ginger reduction, reduce bake time by 3 minutes, sub honey for mirin..."></textarea>
+              <textarea id="formTweaks" rows="3" placeholder="e.g. Scrape away excess marinade before broiling; add more lime juice..."></textarea>
             </div>
           </div>
 
@@ -1330,9 +1519,6 @@
               <h4 class="serif" style="color: var(--accent-forest);">Ingredient Bill of Materials</h4>
               <button type="button" class="btn-secondary" onclick="addIngredientRow()">+ Add Ingredient</button>
             </div>
-            <p style="font-size: 0.78rem; color: var(--ink-muted); margin-bottom: 0.75rem;">
-              Detail fields (e.g., "finely microplaned", "chilled") keep preparation notes clear while allowing clean consolidation on grocery trips.
-            </p>
             <div id="ingredientRowContainer">
               <!-- Dynamically populated rows -->
             </div>
@@ -1412,7 +1598,7 @@
       </div>
       <div class="modal-body">
         <p style="font-size: 0.9rem; color: var(--ink-secondary); margin-bottom: 1rem;">
-          Upload a <strong>.docx</strong> file or paste raw multi-recipe text from your Google Doc. The parser detects distinct recipes, separates ingredient details, and queues them for your archive.
+          Upload a <strong>.docx</strong> file or paste raw multi-recipe text from your Google Doc.
         </p>
 
         <div class="doc-drop-zone" onclick="document.getElementById('docxFileInput').click()">
@@ -1447,27 +1633,20 @@
 
   <script>
     /* ==========================================================================
-       1. DATA STORAGE & INITIALIZATION (IndexedDB)
+       1. DATA STORAGE & PERSISTENCE (IndexedDB - Never Delete User Records)
        ========================================================================== */
     const DB_NAME = 'KitchenAtelierDB';
-    const DB_VERSION = 2;
+    const DB_VERSION = 3;
     let db;
 
     let recipesState = [];
     let plannerState = {
       bakes: [],
-      days: {
-        Monday: [],
-        Tuesday: [],
-        Wednesday: [],
-        Thursday: [],
-        Friday: [],
-        Saturday: [],
-        Sunday: []
-      }
+      days: { Monday: [], Tuesday: [], Wednesday: [], Thursday: [], Friday: [], Saturday: [], Sunday: [] }
     };
     let manualStaplesState = [];
     let checkedBasketItems = {};
+    let checkedPrepTasks = {};
     let stagedParsedRecipes = [];
 
     const DAYS_ORDER = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -1493,28 +1672,23 @@
     }
 
     async function loadAllData() {
+      // 1. Load all existing recipes
       recipesState = await idbGetAll('recipes');
       
+      // 2. Load state variables safely without blowing away data
       const savedPlanner = await idbGet('app_state', 'weekly_planner');
-      if (savedPlanner && savedPlanner.data) {
-        plannerState = savedPlanner.data;
-      }
+      if (savedPlanner && savedPlanner.data) plannerState = savedPlanner.data;
       
       const savedStaples = await idbGet('app_state', 'manual_staples');
-      if (savedStaples && savedStaples.data) {
-        manualStaplesState = savedStaples.data;
-      }
+      if (savedStaples && savedStaples.data) manualStaplesState = savedStaples.data;
 
       const savedChecks = await idbGet('app_state', 'checked_items');
-      if (savedChecks && savedChecks.data) {
-        checkedBasketItems = savedChecks.data;
-      }
+      if (savedChecks && savedChecks.data) checkedBasketItems = savedChecks.data;
 
-      // Populate Seed Recipe if completely fresh
-      if (recipesState.length === 0) {
-        await seedSampleRecipes();
-      }
+      const savedPrepChecks = await idbGet('app_state', 'checked_prep_tasks');
+      if (savedPrepChecks && savedPrepChecks.data) checkedPrepTasks = savedPrepChecks.data;
 
+      // Note: We deliberately do NOT overwrite with demo seeds if recipes exist.
       renderRecipesGrid();
       renderWeeklyPlanner();
       renderMarketBasket();
@@ -1560,6 +1734,7 @@
       await idbPut('app_state', { key: 'weekly_planner', data: plannerState });
       renderWeeklyPlanner();
       renderMarketBasket();
+      renderWeekendPrepWorkspace();
     }
 
     async function persistStaples() {
@@ -1571,85 +1746,12 @@
       await idbPut('app_state', { key: 'checked_items', data: checkedBasketItems });
     }
 
-    /* ==========================================================================
-       2. SEED RECIPES (Gluten-Free & Olive-Free Exemplars)
-       ========================================================================== */
-    async function seedSampleRecipes() {
-      const sample1 = {
-        id: 'rec_miso_salmon',
-        title: 'Miso & Ginger Glazed Salmon',
-        prepTime: '15 mins',
-        cookTime: '18 mins',
-        servings: '2 servings',
-        tags: ['Dinner', 'Gluten-Free', 'Fish', 'Weeknight'],
-        photo: '',
-        ratings: {
-          taste: 5,
-          ease: 4,
-          presentation: 5,
-          leftovers: 3
-        },
-        tweaks: 'Scrape away excess marinade before broiling so sugars do not scorch. Fresh grated ginger makes all the difference.',
-        reviews: [
-          { name: 'Bronson', stars: 5, wouldRepeat: true, quote: 'The glaze caramelizes beautifully on the rice. Definitely add to rotation.' }
-        ],
-        ingredients: [
-          { name: 'Salmon Fillets', amount: '2', unit: 'fillets', detail: 'skin-on, center-cut', aisle: 'Meat & Seafood' },
-          { name: 'White Miso Paste', amount: '2', unit: 'tbsp', detail: 'sweet white variety', aisle: 'Pantry & Dry Goods' },
-          { name: 'Tamari', amount: '1', unit: 'tbsp', detail: 'certified gluten-free', aisle: 'Pantry & Dry Goods' },
-          { name: 'Ginger Root', amount: '1', unit: 'tbsp', detail: 'microplaned finely', aisle: 'Produce' },
-          { name: 'Garlic', amount: '2', unit: 'cloves', detail: 'grated', aisle: 'Produce' },
-          { name: 'Jasmine Rice', amount: '1', unit: 'cup', detail: 'rinsed until clear', aisle: 'Pantry & Dry Goods' }
-        ],
-        instructions: [
-          'Whisk together white miso paste, gluten-free tamari, microplaned ginger, and grated garlic with a splash of warm water.',
-          'Pat salmon dry and coat thoroughly in the marinade. Let rest for 15 minutes.',
-          'Start jasmine rice in saucepan with 1.5 cups water and pinch of salt.',
-          'Broil salmon on a lined sheet pan for 6 to 8 minutes until edges caramelize and fish flakes easily.'
-        ],
-        createdAt: Date.now() - 86400000
-      };
-
-      const sample2 = {
-        id: 'rec_crispy_tofu_miso',
-        title: 'Sesame & Miso Sautéed Green Beans with Tofu',
-        prepTime: '10 mins',
-        cookTime: '15 mins',
-        servings: '3 servings',
-        tags: ['Dinner', 'Lunch', 'Gluten-Free', 'Vegetarian'],
-        photo: '',
-        ratings: {
-          taste: 4,
-          ease: 5,
-          presentation: 4,
-          leftovers: 4
-        },
-        tweaks: 'Blanch green beans in salted boiling water for 90 seconds first for maximum emerald crunch.',
-        reviews: [
-          { name: 'Debbie', stars: 4, wouldRepeat: true, quote: 'Very crisp and light. Great balance of savory and nuttiness.' }
-        ],
-        ingredients: [
-          { name: 'Fresh Green Beans', amount: '1', unit: 'lb', detail: 'trimmed', aisle: 'Produce' },
-          { name: 'Miso Paste', amount: '1', unit: 'tbsp', detail: 'red or white paste', aisle: 'Pantry & Dry Goods' },
-          { name: 'Garlic', amount: '3', unit: 'cloves', detail: 'thinly sliced', aisle: 'Produce' },
-          { name: 'Extra Firm Tofu', amount: '1', unit: 'block', detail: 'pressed and cubed', aisle: 'Dairy & Refrigerated' },
-          { name: 'Toasted Sesame Oil', amount: '1.5', unit: 'tbsp', detail: 'aromatic toasted', aisle: 'Pantry & Dry Goods' }
-        ],
-        instructions: [
-          'Sear pressed tofu cubes in a wide cast iron skillet with toasted sesame oil until golden.',
-          'Add trimmed green beans and sliced garlic, tossing quickly over high heat.',
-          'Stir miso with 2 tablespoons hot water until dissolved; pour over the pan and toss until glazed.'
-        ],
-        createdAt: Date.now()
-      };
-
-      recipesState.push(sample1, sample2);
-      await idbPut('recipes', sample1);
-      await idbPut('recipes', sample2);
+    async function persistPrepChecks() {
+      await idbPut('app_state', { key: 'checked_prep_tasks', data: checkedPrepTasks });
     }
 
     /* ==========================================================================
-       3. VIEW SWITCHING & NAVIGATION
+       2. VIEW SWITCHING & ROUTING
        ========================================================================== */
     function switchView(viewName) {
       document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
@@ -1664,18 +1766,36 @@
       if (clickedBtn) clickedBtn.classList.add('active');
 
       if (viewName === 'planner') renderWeeklyPlanner();
+      if (viewName === 'prep') renderWeekendPrepWorkspace();
       if (viewName === 'basket') renderMarketBasket();
     }
 
     /* ==========================================================================
-       4. RECIPE RENDERING & SEARCH/FILTERS
+       3. RATINGS CALCULATION (Handles Unrated & Untested)
        ========================================================================== */
     function calculateCompositeScore(r) {
-      if (!r || !r.ratings) return 0;
-      const { taste = 3, ease = 3, presentation = 3, leftovers = 3 } = r.ratings;
-      return ((taste * 0.4) + (ease * 0.25) + (presentation * 0.15) + (leftovers * 0.2)).toFixed(1);
+      if (!r || r.isUntested || !r.ratings) return null;
+      const { taste, ease, presentation, leftovers } = r.ratings;
+      
+      const valid = [taste, ease, presentation, leftovers].filter(v => typeof v === 'number' && v > 0);
+      if (valid.length === 0) return null;
+
+      // Weighted average of rated fields
+      let totalWeight = 0;
+      let weightedSum = 0;
+
+      if (typeof taste === 'number' && taste > 0) { weightedSum += taste * 0.4; totalWeight += 0.4; }
+      if (typeof ease === 'number' && ease > 0) { weightedSum += ease * 0.25; totalWeight += 0.25; }
+      if (typeof presentation === 'number' && presentation > 0) { weightedSum += presentation * 0.15; totalWeight += 0.15; }
+      if (typeof leftovers === 'number' && leftovers > 0) { weightedSum += leftovers * 0.2; totalWeight += 0.2; }
+
+      if (totalWeight === 0) return null;
+      return (weightedSum / totalWeight).toFixed(1);
     }
 
+    /* ==========================================================================
+       4. RECIPE RENDERING & SEARCH
+       ========================================================================== */
     function renderRecipesGrid() {
       const container = document.getElementById('recipesGridContainer');
       const searchTerm = document.getElementById('recipeSearchInput').value.toLowerCase().trim();
@@ -1685,19 +1805,28 @@
       let filtered = [...recipesState].filter(recipe => {
         const matchesSearch = 
           recipe.title.toLowerCase().includes(searchTerm) ||
-          recipe.tweaks?.toLowerCase().includes(searchTerm) ||
+          (recipe.tweaks && recipe.tweaks.toLowerCase().includes(searchTerm)) ||
+          (recipe.weekendPrep && recipe.weekendPrep.toLowerCase().includes(searchTerm)) ||
           recipe.ingredients.some(i => i.name.toLowerCase().includes(searchTerm) || (i.detail && i.detail.toLowerCase().includes(searchTerm))) ||
           recipe.tags.some(t => t.toLowerCase().includes(searchTerm));
 
-        const matchesTag = (tagVal === 'all') || 
-          recipe.tags.some(t => t.toLowerCase().replace(/[^a-z]/g, '') === tagVal.replace(/[^a-z]/g, ''));
+        let matchesTag = true;
+        if (tagVal === 'untested') {
+          matchesTag = !!recipe.isUntested || calculateCompositeScore(recipe) === null;
+        } else if (tagVal !== 'all') {
+          matchesTag = recipe.tags.some(t => t.toLowerCase().replace(/[^a-z]/g, '') === tagVal.replace(/[^a-z]/g, ''));
+        }
 
         return matchesSearch && matchesTag;
       });
 
       // Sorting
       if (sortVal === 'score') {
-        filtered.sort((a, b) => calculateCompositeScore(b) - calculateCompositeScore(a));
+        filtered.sort((a, b) => {
+          const scoreA = calculateCompositeScore(a) || -1;
+          const scoreB = calculateCompositeScore(b) || -1;
+          return scoreB - scoreA;
+        });
       } else if (sortVal === 'newest') {
         filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
       } else if (sortVal === 'alphabetical') {
@@ -1707,8 +1836,8 @@
       if (filtered.length === 0) {
         container.innerHTML = `
           <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: var(--ink-muted);">
-            <p class="serif" style="font-size: 1.4rem; color: var(--accent-forest); margin-bottom: 0.5rem;">No Recipes Match Your Criteria</p>
-            <p style="font-size: 0.9rem;">Try adjusting your search filters or click "New Recipe" to record an heirloom dish.</p>
+            <p class="serif" style="font-size: 1.4rem; color: var(--accent-forest); margin-bottom: 0.5rem;">No Recipes Match Your Filters</p>
+            <p style="font-size: 0.9rem;">Try adjusting your search query or click "New Recipe" to record an heirloom dish.</p>
           </div>
         `;
         return;
@@ -1718,6 +1847,7 @@
         const score = calculateCompositeScore(recipe);
         const guestCount = recipe.reviews?.length || 0;
         const hasPhoto = !!recipe.photo;
+        const isUntested = !!recipe.isUntested;
 
         return `
           <article class="recipe-card" onclick="openRecipeFolio('${recipe.id}')">
@@ -1733,12 +1863,17 @@
             `}
             <div class="recipe-card-content">
               <div class="card-tags">
+                ${isUntested ? `<span class="badge-untested">Untested</span>` : ''}
                 ${recipe.tags.slice(0, 3).map(t => `<span class="badge-tag">${t}</span>`).join('')}
               </div>
               <h3 class="recipe-card-title serif">${recipe.title}</h3>
               
               <div class="ratings-summary-row">
-                <div class="score-badge">★ ${score}</div>
+                ${score !== null ? `
+                  <div class="score-badge">★ ${score}</div>
+                ` : `
+                  <div class="score-badge is-unrated">Unrated / In Testing</div>
+                `}
                 ${guestCount > 0 ? `
                   <div class="guest-feedback-chip">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -1768,13 +1903,15 @@
     }
 
     /* ==========================================================================
-       5. DETAILED FOLIO MODAL
+       5. RECIPE FOLIO MODAL
        ========================================================================== */
     function openRecipeFolio(recipeId) {
       const recipe = recipesState.find(r => r.id === recipeId);
       if (!recipe) return;
 
       const score = calculateCompositeScore(recipe);
+      const isUntested = !!recipe.isUntested;
+
       const actionPills = document.getElementById('modalActionPills');
       actionPills.innerHTML = `
         <button class="btn-action" onclick="openScheduleModal('${recipe.id}')">
@@ -1789,6 +1926,7 @@
       content.innerHTML = `
         <div class="recipe-folio-header">
           <div class="card-tags" style="justify-content: center; margin-bottom: 0.5rem;">
+            ${isUntested ? `<span class="badge-untested" style="font-size: 0.8rem; padding: 0.2rem 0.6rem;">Untested Recipe (Not Made Yet)</span>` : ''}
             ${recipe.tags.map(t => `<span class="badge-tag">${t}</span>`).join('')}
           </div>
           <h2 class="recipe-folio-title">${recipe.title}</h2>
@@ -1809,26 +1947,37 @@
         <div class="ratings-card-panel">
           <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem;">
             <h4 class="serif" style="color: var(--accent-forest); font-size: 1.1rem;">Sensory Scorecard</h4>
-            <div class="score-badge" style="font-size: 1rem;">Composite Score: ★ ${score} / 5.0</div>
+            ${score !== null ? `
+              <div class="score-badge" style="font-size: 1rem;">Composite Score: ★ ${score} / 5.0</div>
+            ` : `
+              <div class="score-badge is-unrated">Unrated / In Testing</div>
+            `}
           </div>
-          <div class="ratings-metrics-grid">
-            <div class="metric-cell">
-              <span class="metric-label">Taste Profile</span>
-              <span class="star-meter">${'★'.repeat(recipe.ratings?.taste || 0)}${'☆'.repeat(5 - (recipe.ratings?.taste || 0))}</span>
+
+          ${isUntested ? `
+            <div class="unrated-notice">
+              This recipe is marked as untested. Cook it and rate flavor, ease, presentation, and leftovers when ready!
             </div>
-            <div class="metric-cell">
-              <span class="metric-label">Execution Ease</span>
-              <span class="star-meter">${'★'.repeat(recipe.ratings?.ease || 0)}${'☆'.repeat(5 - (recipe.ratings?.ease || 0))}</span>
+          ` : `
+            <div class="ratings-metrics-grid">
+              <div class="metric-cell">
+                <span class="metric-label">Taste Profile</span>
+                <span class="star-meter">${recipe.ratings?.taste ? '★'.repeat(recipe.ratings.taste) + '☆'.repeat(5 - recipe.ratings.taste) : '<span class="unrated-notice">—</span>'}</span>
+              </div>
+              <div class="metric-cell">
+                <span class="metric-label">Execution Ease</span>
+                <span class="star-meter">${recipe.ratings?.ease ? '★'.repeat(recipe.ratings.ease) + '☆'.repeat(5 - recipe.ratings.ease) : '<span class="unrated-notice">—</span>'}</span>
+              </div>
+              <div class="metric-cell">
+                <span class="metric-label">Plating Appeal</span>
+                <span class="star-meter">${recipe.ratings?.presentation ? '★'.repeat(recipe.ratings.presentation) + '☆'.repeat(5 - recipe.ratings.presentation) : '<span class="unrated-notice">—</span>'}</span>
+              </div>
+              <div class="metric-cell">
+                <span class="metric-label">Leftover Quality</span>
+                <span class="star-meter">${recipe.ratings?.leftovers ? '★'.repeat(recipe.ratings.leftovers) + '☆'.repeat(5 - recipe.ratings.leftovers) : '<span class="unrated-notice">—</span>'}</span>
+              </div>
             </div>
-            <div class="metric-cell">
-              <span class="metric-label">Plating Appeal</span>
-              <span class="star-meter">${'★'.repeat(recipe.ratings?.presentation || 0)}${'☆'.repeat(5 - (recipe.ratings?.presentation || 0))}</span>
-            </div>
-            <div class="metric-cell">
-              <span class="metric-label">Leftover Quality</span>
-              <span class="star-meter">${'★'.repeat(recipe.ratings?.leftovers || 0)}${'☆'.repeat(5 - (recipe.ratings?.leftovers || 0))}</span>
-            </div>
-          </div>
+          `}
 
           ${recipe.tweaks ? `
             <div class="chef-journal">
@@ -1840,6 +1989,17 @@
             </div>
           ` : ''}
         </div>
+
+        <!-- Weekend Prep Callout -->
+        ${recipe.weekendPrep ? `
+          <div class="weekend-prep-panel">
+            <h4>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Weekend Prep-Ahead Protocol
+            </h4>
+            <div style="font-size: 0.95rem; color: var(--ink-secondary);">${recipe.weekendPrep}</div>
+          </div>
+        ` : ''}
 
         <!-- The Tasting Table / Guest Feedback -->
         ${recipe.reviews && recipe.reviews.length > 0 ? `
@@ -1917,13 +2077,17 @@
         document.getElementById('formCookTime').value = recipe.cookTime || '';
         document.getElementById('formServings').value = recipe.servings || '';
         document.getElementById('formTags').value = recipe.tags.join(', ');
+        document.getElementById('formWeekendPrep').value = recipe.weekendPrep || '';
         document.getElementById('formTweaks').value = recipe.tweaks || '';
         document.getElementById('formInstructions').value = recipe.instructions.join('\n');
 
-        document.getElementById('ratingTaste').value = recipe.ratings?.taste || 4;
-        document.getElementById('ratingEase').value = recipe.ratings?.ease || 4;
-        document.getElementById('ratingPresentation').value = recipe.ratings?.presentation || 4;
-        document.getElementById('ratingLeftovers').value = recipe.ratings?.leftovers || 4;
+        const isUntested = !!recipe.isUntested;
+        document.getElementById('formIsUntested').checked = isUntested;
+
+        document.getElementById('ratingTaste').value = recipe.ratings?.taste || 'unrated';
+        document.getElementById('ratingEase').value = recipe.ratings?.ease || 'unrated';
+        document.getElementById('ratingPresentation').value = recipe.ratings?.presentation || 'unrated';
+        document.getElementById('ratingLeftovers').value = recipe.ratings?.leftovers || 'unrated';
 
         if (recipe.photo) {
           document.getElementById('formPhotoBase64').value = recipe.photo;
@@ -1939,11 +2103,31 @@
       } else {
         document.getElementById('editModalHeaderTitle').textContent = 'Catalog New Recipe';
         document.getElementById('editRecipeId').value = '';
+        document.getElementById('formIsUntested').checked = false;
+        document.getElementById('ratingTaste').value = 'unrated';
+        document.getElementById('ratingEase').value = 'unrated';
+        document.getElementById('ratingPresentation').value = 'unrated';
+        document.getElementById('ratingLeftovers').value = 'unrated';
         addIngredientRow();
         addIngredientRow();
       }
 
+      toggleRatingsSectionState();
       document.getElementById('recipeEditModal').classList.add('active');
+    }
+
+    function toggleRatingsSectionState() {
+      const isUntested = document.getElementById('formIsUntested').checked;
+      const ratingsPanel = document.getElementById('ratingsCardPanel');
+      if (isUntested) {
+        document.getElementById('ratingTaste').value = 'unrated';
+        document.getElementById('ratingEase').value = 'unrated';
+        document.getElementById('ratingPresentation').value = 'unrated';
+        document.getElementById('ratingLeftovers').value = 'unrated';
+        ratingsPanel.style.opacity = '0.6';
+      } else {
+        ratingsPanel.style.opacity = '1';
+      }
     }
 
     function addIngredientRow(data = {}) {
@@ -2002,7 +2186,6 @@
 
       const reader = new FileReader();
       reader.onload = function(evt) {
-        // Downscale image using canvas to save storage
         const img = new Image();
         img.onload = function() {
           const canvas = document.createElement('canvas');
@@ -2032,9 +2215,16 @@
     async function saveRecipe(e) {
       e.preventDefault();
       const existingId = document.getElementById('editRecipeId').value;
-      const id = existingId || ('rec_' + Date.now().toString(36));
+      const id = existingId || ('rec_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5));
 
-      // Gather ingredients
+      const isUntested = document.getElementById('formIsUntested').checked;
+
+      const parseRatingVal = (elId) => {
+        if (isUntested) return null;
+        const val = document.getElementById(elId).value;
+        return val === 'unrated' ? null : parseInt(val, 10);
+      };
+
       const ingRows = document.querySelectorAll('#ingredientRowContainer .ing-entry-row');
       const ingredients = Array.from(ingRows).map(row => ({
         amount: row.querySelector('.row-qty').value.trim(),
@@ -2044,7 +2234,6 @@
         aisle: row.querySelector('.row-aisle').value
       })).filter(i => i.name.length > 0);
 
-      // Gather guest feedback
       const revRows = document.querySelectorAll('#guestFeedbackEditorContainer .review-bubble');
       const reviews = Array.from(revRows).map(row => ({
         name: row.querySelector('.rev-name').value.trim(),
@@ -2071,12 +2260,14 @@
         servings: document.getElementById('formServings').value.trim(),
         tags,
         photo: document.getElementById('formPhotoBase64').value || '',
+        isUntested,
         ratings: {
-          taste: parseInt(document.getElementById('ratingTaste').value, 10),
-          ease: parseInt(document.getElementById('ratingEase').value, 10),
-          presentation: parseInt(document.getElementById('ratingPresentation').value, 10),
-          leftovers: parseInt(document.getElementById('ratingLeftovers').value, 10)
+          taste: parseRatingVal('ratingTaste'),
+          ease: parseRatingVal('ratingEase'),
+          presentation: parseRatingVal('ratingPresentation'),
+          leftovers: parseRatingVal('ratingLeftovers')
         },
+        weekendPrep: document.getElementById('formWeekendPrep').value.trim(),
         tweaks: document.getElementById('formTweaks').value.trim(),
         reviews,
         ingredients,
@@ -2094,6 +2285,7 @@
       renderRecipesGrid();
       renderWeeklyPlanner();
       renderMarketBasket();
+      renderWeekendPrepWorkspace();
     }
 
     async function deleteRecipe(recipeId) {
@@ -2101,7 +2293,6 @@
       await idbDelete('recipes', recipeId);
       recipesState = recipesState.filter(r => r.id !== recipeId);
       
-      // Clean up planner
       for (const day of DAYS_ORDER) {
         plannerState.days[day] = plannerState.days[day].filter(slot => slot.recipeId !== recipeId);
       }
@@ -2113,7 +2304,7 @@
     }
 
     /* ==========================================================================
-       7. MULTI-DAY MEAL SCHEDULING WITH LEFTOVER TRACKING
+       7. WEEKLY MEAL SCHEDULER
        ========================================================================== */
     function openScheduleModal(recipeId) {
       const recipe = recipesState.find(r => r.id === recipeId);
@@ -2122,7 +2313,6 @@
       document.getElementById('scheduleRecipeId').value = recipe.id;
       document.getElementById('scheduleRecipeTitleBanner').textContent = `Scheduling: ${recipe.title}`;
       
-      // Default to baked goods if tagged baked
       const isBaked = recipe.tags.some(t => t.toLowerCase().includes('bake') || t.toLowerCase().includes('bread') || t.toLowerCase().includes('pastry'));
       document.getElementById('scheduleCategorySelect').value = isBaked ? 'Baked Goods' : 'Dinner';
 
@@ -2181,12 +2371,11 @@
     }
 
     function renderWeeklyPlanner() {
-      // 1. Render Hearth Bakes Shelf
       const bakesContainer = document.getElementById('hearthBakesContainer');
       if (plannerState.bakes.length === 0) {
         bakesContainer.innerHTML = `
           <div style="font-size: 0.85rem; color: var(--ink-muted); font-style: italic; padding: 0.5rem 0;">
-            No weekly bakes scheduled. Add a sourdough boule, loaf, or baked treat for the week.
+            No weekly bakes scheduled. Add a sourdough boule, breakfast bake, or treat for the week.
           </div>
         `;
       } else {
@@ -2205,7 +2394,6 @@
         }).join('');
       }
 
-      // 2. Render 7 Days
       const grid = document.getElementById('weeklyScheduleGrid');
       grid.innerHTML = DAYS_ORDER.map(day => {
         const slots = plannerState.days[day] || [];
@@ -2263,7 +2451,89 @@
     }
 
     /* ==========================================================================
-       8. MARKET BASKET & INGREDIENT AGGREGATION ENGINE
+       8. WEEKEND PREP NAVIGATOR & BATCH COOKING
+       ========================================================================== */
+    function renderWeekendPrepWorkspace() {
+      const container = document.getElementById('weekendPrepListContainer');
+      const plannedRecipeMap = new Map();
+
+      // Collect all recipes from planned meals
+      for (const day of DAYS_ORDER) {
+        (plannerState.days[day] || []).forEach(slot => {
+          if (!slot.isLeftover) {
+            const recipe = recipesState.find(r => r.id === slot.recipeId);
+            if (recipe) {
+              if (!plannedRecipeMap.has(recipe.id)) {
+                plannedRecipeMap.set(recipe.id, { recipe, days: [day] });
+              } else {
+                plannedRecipeMap.get(recipe.id).days.push(day);
+              }
+            }
+          }
+        });
+      }
+
+      // Collect from hearth bakes
+      (plannerState.bakes || []).forEach(bake => {
+        const recipe = recipesState.find(r => r.id === bake.recipeId);
+        if (recipe && !plannedRecipeMap.has(recipe.id)) {
+          plannedRecipeMap.set(recipe.id, { recipe, days: ['Whole Week Bake'] });
+        }
+      });
+
+      const prepEligible = Array.from(plannedRecipeMap.values()).filter(item => !!item.recipe.weekendPrep);
+
+      if (prepEligible.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 3rem 1rem; color: var(--ink-muted);">
+            <p class="serif" style="font-size: 1.3rem; color: var(--accent-forest); margin-bottom: 0.5rem;">No Weekend Prep Actions Scheduled</p>
+            <p style="font-size: 0.9rem;">None of the meals currently scheduled on your Weekly Menu have weekend prep-ahead notes attached.</p>
+            <p style="font-size: 0.85rem; margin-top: 0.5rem;">Edit your recipes to add advance steps like marinades, roasted vegetables, doughs, or baked egg bites.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = prepEligible.map(({ recipe, days }) => {
+        const checkKey = `prep_${recipe.id}`;
+        const isChecked = !!checkedPrepTasks[checkKey];
+
+        return `
+          <div class="prep-task-card" id="card_${checkKey}">
+            <label class="prep-check-label ${isChecked ? 'checked' : ''}">
+              <input type="checkbox" class="basket-checkbox" style="margin-top: 0.2rem;" ${isChecked ? 'checked' : ''} onchange="togglePrepTaskChecked('${checkKey}')">
+              <div style="flex: 1;">
+                <div class="prep-task-head">
+                  <span class="prep-dish-title" onclick="openRecipeFolio('${recipe.id}')">${recipe.title}</span>
+                  <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-brass); font-weight: 700;">Scheduled for: ${days.join(', ')}</span>
+                </div>
+                <div class="prep-instructions-box">${recipe.weekendPrep}</div>
+              </div>
+            </label>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function togglePrepTaskChecked(key) {
+      checkedPrepTasks[key] = !checkedPrepTasks[key];
+      const card = document.getElementById(`card_${key}`);
+      if (card) {
+        const label = card.querySelector('.prep-check-label');
+        if (checkedPrepTasks[key]) label.classList.add('checked');
+        else label.classList.remove('checked');
+      }
+      await persistPrepChecks();
+    }
+
+    async function clearWeekendPrepChecks() {
+      checkedPrepTasks = {};
+      await persistPrepChecks();
+      renderWeekendPrepWorkspace();
+    }
+
+    /* ==========================================================================
+       9. MARKET BASKET & INGREDIENT AGGREGATION ENGINE
        ========================================================================== */
     const UNIT_SYNONYMS = {
       'tbsp': 'tbsp', 'tablespoon': 'tbsp', 'tablespoons': 'tbsp', 'tbs': 'tbsp', 'T': 'tbsp',
@@ -2300,7 +2570,6 @@
       if (!qtyStr) return 0;
       qtyStr = qtyStr.toString().trim();
       
-      // Mixed number: "1 1/2"
       if (qtyStr.includes(' ') && qtyStr.includes('/')) {
         const parts = qtyStr.split(' ');
         const whole = parseFloat(parts[0]) || 0;
@@ -2309,7 +2578,6 @@
         return whole + frac;
       }
       
-      // Simple fraction: "3/4"
       if (qtyStr.includes('/')) {
         const fracParts = qtyStr.split('/');
         return (parseFloat(fracParts[0]) || 0) / (parseFloat(fracParts[1]) || 1);
@@ -2340,9 +2608,8 @@
     function compileWeeklyBasket() {
       const activeRecipeInstances = [];
 
-      // Add scheduled meals (EXCLUDING leftovers)
       for (const day of DAYS_ORDER) {
-        plannerState.days[day].forEach(slot => {
+        (plannerState.days[day] || []).forEach(slot => {
           if (!slot.isLeftover) {
             const recipe = recipesState.find(r => r.id === slot.recipeId);
             if (recipe) activeRecipeInstances.push({ recipe, source: `${day} (${slot.mealType})` });
@@ -2350,8 +2617,7 @@
         });
       }
 
-      // Add hearth bakes
-      plannerState.bakes.forEach(bake => {
+      (plannerState.bakes || []).forEach(bake => {
         const recipe = recipesState.find(r => r.id === bake.recipeId);
         if (recipe) activeRecipeInstances.push({ recipe, source: 'Weekly Bake' });
       });
@@ -2376,13 +2642,11 @@
             };
           }
 
-          // Accumulate quantity
           if (!aggregated[rootKey].unitsMap[canonicalUnit]) {
             aggregated[rootKey].unitsMap[canonicalUnit] = 0;
           }
           aggregated[rootKey].unitsMap[canonicalUnit] += qty;
 
-          // Record prep instructions & origin
           if (ing.detail && !aggregated[rootKey].details.includes(ing.detail)) {
             aggregated[rootKey].details.push(ing.detail);
           }
@@ -2390,7 +2654,6 @@
         });
       });
 
-      // Integrate manual staples
       manualStaplesState.forEach(staple => {
         const rootKey = 'manual_' + staple.id;
         aggregated[rootKey] = {
@@ -2421,7 +2684,6 @@
         return;
       }
 
-      // Group by Aisle
       const aisles = {};
       keys.forEach(k => {
         const item = aggregated[k];
@@ -2442,7 +2704,6 @@
                 const itemKey = `chk_${item.key.replace(/[^a-zA-Z0-9]/g, '_')}`;
                 const isChecked = !!checkedBasketItems[itemKey];
 
-                // Build quantity string
                 let qtyDisplay = '';
                 if (item.isManual) {
                   qtyDisplay = Object.keys(item.unitsMap)[0] || '';
@@ -2510,7 +2771,7 @@
     }
 
     /* ==========================================================================
-       9. MULTI-RECIPE DOCUMENT BATCH IMPORTER (ENHANCED PARSER)
+       10. MULTI-RECIPE DOCUMENT BATCH IMPORTER
        ========================================================================== */
     function openDocImportModal() {
       document.getElementById('rawDocTextarea').value = '';
@@ -2704,13 +2965,13 @@
         servings: servings || '4 servings',
         tags: ['Dinner', 'Gluten-Free', 'Imported'],
         photo: '',
-        ratings: { taste: 4, ease: 4, presentation: 4, leftovers: 4 },
+        isUntested: true,
+        ratings: { taste: null, ease: null, presentation: null, leftovers: null },
+        weekendPrep: '',
         tweaks: '',
         reviews: [],
         ingredients,
-        instructions: rawInstructionParagraphs.length > 0 
-          ? rawInstructionParagraphs 
-          : ['Follow standard cooking and assembly instructions.'],
+        instructions: rawInstructionParagraphs.length > 0 ? rawInstructionParagraphs : ['Follow standard preparation methods.'],
         createdAt: Date.now()
       };
     }
@@ -2777,13 +3038,14 @@
     }
 
     /* ==========================================================================
-       10. BACKUP & RESTORE UTILITIES
+       11. BACKUP & RESTORE UTILITIES
        ========================================================================== */
     function exportDataBackup() {
       const payload = {
         recipes: recipesState,
         planner: plannerState,
         staples: manualStaplesState,
+        checkedPrep: checkedPrepTasks,
         exportedAt: new Date().toISOString()
       };
       const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -2814,9 +3076,14 @@
             manualStaplesState = imported.staples;
             await persistStaples();
           }
+          if (imported.checkedPrep) {
+            checkedPrepTasks = imported.checkedPrep;
+            await persistPrepChecks();
+          }
           renderRecipesGrid();
           renderWeeklyPlanner();
           renderMarketBasket();
+          renderWeekendPrepWorkspace();
           alert('Folio and Weekly Menu restored successfully.');
         } catch (err) {
           alert('Invalid backup file.');
@@ -2829,14 +3096,12 @@
       document.getElementById(id).classList.remove('active');
     }
 
-    // Close on overlay click
     document.querySelectorAll('.modal-overlay').forEach(modal => {
       modal.addEventListener('click', (e) => {
         if (e.target === modal) modal.classList.remove('active');
       });
     });
 
-    // Boot
     window.addEventListener('DOMContentLoaded', () => {
       initDatabase();
     });
