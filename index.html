@@ -196,6 +196,34 @@
       border-color: var(--border-strong);
     }
 
+    /* Segmented Sub-Nav Controls */
+    .segmented-control {
+      display: inline-flex;
+      background: var(--bg-parchment);
+      padding: 0.25rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-warm);
+      gap: 0.25rem;
+    }
+
+    .segmented-btn {
+      background: none;
+      border: none;
+      padding: 0.4rem 0.9rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ink-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .segmented-btn.active {
+      background: var(--card-bg);
+      color: var(--accent-forest);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
     main {
       flex: 1;
       max-width: 1400px;
@@ -253,7 +281,7 @@
 
     .search-wrap input {
       width: 100%;
-      padding: 0.65rem 1rem 0.65rem 2.85rem; /* Generous indent preventing any asset overlap */
+      padding: 0.65rem 1rem 0.65rem 2.85rem;
       border: 1px solid var(--border-warm);
       border-radius: var(--radius-sm);
       background: var(--bg-cream);
@@ -844,7 +872,20 @@
     .planner-container {
       display: flex;
       flex-direction: column;
-      gap: 2rem;
+      gap: 1.75rem;
+    }
+
+    .planner-top-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--border-warm);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1.25rem;
+      box-shadow: var(--shadow-subtle);
+      flex-wrap: wrap;
+      gap: 1rem;
     }
 
     .hearth-bakes-shelf {
@@ -1030,6 +1071,8 @@
       justify-content: space-between;
       align-items: baseline;
       margin-bottom: 0.4rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
     }
 
     .prep-dish-title {
@@ -1209,7 +1252,6 @@
     <div class="header-inner">
       <div class="logo-mark">
         <div class="logo-icon-wrap">
-          <!-- Authentic Culinary Hearth & Crossed Knife/Spoon Mark -->
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M18 3v4c0 1.5-1 2.5-2.5 3L14 11v10h-2V11l-1.5-1C9 9.5 8 8.5 8 7V3"/>
             <path d="M12 2v5"/>
@@ -1291,11 +1333,25 @@
       </div>
     </section>
 
-    <!-- VIEW 2: WEEKLY MENU & HEARTH -->
+    <!-- VIEW 2: WEEKLY MENU & HEARTH (DUAL WEEK) -->
     <section id="view-planner" class="view-panel">
       <div class="planner-container">
         
-        <!-- Hearth & Weekly Bakes Shelf (Not bound to specific day) -->
+        <!-- Planner Top Bar with Week Switcher -->
+        <div class="planner-top-toolbar">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <span class="serif" style="font-size: 1.25rem; color: var(--accent-forest);">Active Menu View:</span>
+            <div class="segmented-control">
+              <button class="segmented-btn active" id="btnWeekCurrent" onclick="setPlannerActiveWeek('current')">This Week</button>
+              <button class="segmented-btn" id="btnWeekNext" onclick="setPlannerActiveWeek('next')">Following Week</button>
+            </div>
+          </div>
+          <span id="plannerWeekNotice" style="font-size: 0.85rem; color: var(--ink-muted); font-style: italic;">
+            Planning for This Week
+          </span>
+        </div>
+
+        <!-- Hearth & Weekly Bakes Shelf -->
         <div class="hearth-bakes-shelf">
           <div class="hearth-shelf-head">
             <h3>
@@ -1320,14 +1376,21 @@
     <!-- VIEW 3: WEEKEND PREP WORKSPACE -->
     <section id="view-prep" class="view-panel">
       <div class="prep-workspace-sheet">
-        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.5rem; border-bottom: 1.5px solid var(--border-warm); padding-bottom: 0.75rem;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.5rem; border-bottom: 1.5px solid var(--border-warm); padding-bottom: 0.75rem; flex-wrap: wrap; gap: 1rem;">
           <div>
             <h2 class="serif" style="font-size: 1.8rem; color: var(--accent-forest);">Weekend Prep Navigator</h2>
             <p style="font-size: 0.88rem; color: var(--ink-muted); margin-top: 0.2rem;">
-              Batch tasks, sauces, egg bites, and advance steps for all recipes scheduled in your upcoming week.
+              Batch tasks, sauces, egg bites, and advance steps for all recipes scheduled across your meal plans.
             </p>
           </div>
-          <button class="btn-secondary" onclick="clearWeekendPrepChecks()">Reset Prep Checkbox List</button>
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div class="segmented-control">
+              <button class="segmented-btn active" id="btnPrepCurrent" onclick="setPrepScope('current')">This Week</button>
+              <button class="segmented-btn" id="btnPrepNext" onclick="setPrepScope('next')">Following Week</button>
+              <button class="segmented-btn" id="btnPrepBoth" onclick="setPrepScope('both')">Both Weeks</button>
+            </div>
+            <button class="btn-secondary" onclick="clearWeekendPrepChecks()">Reset Checks</button>
+          </div>
         </div>
 
         <div id="weekendPrepListContainer">
@@ -1336,12 +1399,22 @@
       </div>
     </section>
 
-    <!-- VIEW 4: MARKET BASKET (AGGREGATED GROCERY) -->
+    <!-- VIEW 4: MARKET BASKET (AGGREGATED GROCERY WITH MID-WEEK MULTI-WEEK AGGREGATION) -->
     <section id="view-basket" class="view-panel">
       <div class="market-basket-layout">
         <div class="basket-sheet">
-          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.5rem;">
-            <h2 class="serif" style="font-size: 1.8rem; color: var(--accent-forest);">Market Provisions</h2>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <h2 class="serif" style="font-size: 1.8rem; color: var(--accent-forest);">Market Provisions</h2>
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                <span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-muted); font-weight: 700;">Provision Scope:</span>
+                <div class="segmented-control">
+                  <button class="segmented-btn active" id="btnBasketScopeCurrent" onclick="setBasketScope('current')">This Week</button>
+                  <button class="segmented-btn" id="btnBasketScopeNext" onclick="setBasketScope('next')">Following Week</button>
+                  <button class="segmented-btn" id="btnBasketScopeBoth" onclick="setBasketScope('both')">Both Weeks Combined</button>
+                </div>
+              </div>
+            </div>
             <div style="display: flex; gap: 0.5rem;">
               <button class="btn-secondary" onclick="window.print()">Print Basket</button>
               <button class="btn-secondary" onclick="clearCheckedItems()">Clear Checked</button>
@@ -1456,7 +1529,7 @@
             <textarea id="formWeekendPrep" rows="2" placeholder="e.g. Whisk marinade in advance; bake egg bites on Sunday; chop sweet potatoes into cubes and store airtight..."></textarea>
           </div>
 
-          <!-- Robust Multi-Dimensional Ratings System (Allows Unrated state) -->
+          <!-- Robust Multi-Dimensional Ratings System -->
           <div class="ratings-card-panel" id="ratingsCardPanel">
             <h4 class="serif" style="margin-bottom: 0.8rem; color: var(--accent-forest);">Scorecard & Sensory Metrics</h4>
             <div class="ratings-metrics-grid">
@@ -1550,7 +1623,7 @@
     </div>
   </div>
 
-  <!-- MULTI-DAY MEAL SCHEDULER MODAL -->
+  <!-- MULTI-DAY MEAL SCHEDULER MODAL (SUPPORTS THIS WEEK & NEXT WEEK) -->
   <div id="scheduleMealModal" class="modal-overlay">
     <div class="modal-dialog" style="max-width: 520px;">
       <div class="modal-header">
@@ -1561,6 +1634,14 @@
         <input type="hidden" id="scheduleRecipeId">
         <div id="scheduleRecipeTitleBanner" style="font-weight: 600; font-size: 1.1rem; margin-bottom: 1rem; color: var(--accent-forest);"></div>
         
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label>Target Week</label>
+          <select id="scheduleTargetWeekSelect">
+            <option value="current">This Week</option>
+            <option value="next">Following Week</option>
+          </select>
+        </div>
+
         <div class="form-group" style="margin-bottom: 1rem;">
           <label>Meal Category</label>
           <select id="scheduleCategorySelect" onchange="toggleSchedulerDaysVisibility()">
@@ -1633,17 +1714,30 @@
 
   <script>
     /* ==========================================================================
-       1. DATA STORAGE & PERSISTENCE (IndexedDB - Never Delete User Records)
+       1. DATA STORAGE & PERSISTENCE (IndexedDB - Dual Week Data Model)
        ========================================================================== */
     const DB_NAME = 'KitchenAtelierDB';
-    const DB_VERSION = 3;
+    const DB_VERSION = 4;
     let db;
 
     let recipesState = [];
+    
+    // Dual Week Architecture: 'current' and 'next'
     let plannerState = {
-      bakes: [],
-      days: { Monday: [], Tuesday: [], Wednesday: [], Thursday: [], Friday: [], Saturday: [], Sunday: [] }
+      current: {
+        bakes: [],
+        days: { Monday: [], Tuesday: [], Wednesday: [], Thursday: [], Friday: [], Saturday: [], Sunday: [] }
+      },
+      next: {
+        bakes: [],
+        days: { Monday: [], Tuesday: [], Wednesday: [], Thursday: [], Friday: [], Saturday: [], Sunday: [] }
+      }
     };
+
+    let activePlannerWeek = 'current'; // 'current' or 'next'
+    let activeBasketScope = 'current'; // 'current', 'next', or 'both'
+    let activePrepScope = 'current';   // 'current', 'next', or 'both'
+
     let manualStaplesState = [];
     let checkedBasketItems = {};
     let checkedPrepTasks = {};
@@ -1672,12 +1766,21 @@
     }
 
     async function loadAllData() {
-      // 1. Load all existing recipes
       recipesState = await idbGetAll('recipes');
       
-      // 2. Load state variables safely without blowing away data
       const savedPlanner = await idbGet('app_state', 'weekly_planner');
-      if (savedPlanner && savedPlanner.data) plannerState = savedPlanner.data;
+      if (savedPlanner && savedPlanner.data) {
+        // Backward-compatibility check: migrate old single-week planner to current
+        if (savedPlanner.data.days && !savedPlanner.data.current) {
+          plannerState.current = savedPlanner.data;
+          plannerState.next = {
+            bakes: [],
+            days: { Monday: [], Tuesday: [], Wednesday: [], Thursday: [], Friday: [], Saturday: [], Sunday: [] }
+          };
+        } else if (savedPlanner.data.current) {
+          plannerState = savedPlanner.data;
+        }
+      }
       
       const savedStaples = await idbGet('app_state', 'manual_staples');
       if (savedStaples && savedStaples.data) manualStaplesState = savedStaples.data;
@@ -1688,7 +1791,6 @@
       const savedPrepChecks = await idbGet('app_state', 'checked_prep_tasks');
       if (savedPrepChecks && savedPrepChecks.data) checkedPrepTasks = savedPrepChecks.data;
 
-      // Note: We deliberately do NOT overwrite with demo seeds if recipes exist.
       renderRecipesGrid();
       renderWeeklyPlanner();
       renderMarketBasket();
@@ -1780,7 +1882,6 @@
       const valid = [taste, ease, presentation, leftovers].filter(v => typeof v === 'number' && v > 0);
       if (valid.length === 0) return null;
 
-      // Weighted average of rated fields
       let totalWeight = 0;
       let weightedSum = 0;
 
@@ -1820,7 +1921,6 @@
         return matchesSearch && matchesTag;
       });
 
-      // Sorting
       if (sortVal === 'score') {
         filtered.sort((a, b) => {
           const scoreA = calculateCompositeScore(a) || -1;
@@ -1916,7 +2016,7 @@
       actionPills.innerHTML = `
         <button class="btn-action" onclick="openScheduleModal('${recipe.id}')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-          Plan into Week
+          Plan into Menu
         </button>
         <button class="btn-secondary" onclick="openRecipeEditor('${recipe.id}')">Edit Entry</button>
         <button class="btn-secondary" style="color: var(--accent-terracotta);" onclick="deleteRecipe('${recipe.id}')">Archive</button>
@@ -2293,10 +2393,13 @@
       await idbDelete('recipes', recipeId);
       recipesState = recipesState.filter(r => r.id !== recipeId);
       
-      for (const day of DAYS_ORDER) {
-        plannerState.days[day] = plannerState.days[day].filter(slot => slot.recipeId !== recipeId);
-      }
-      plannerState.bakes = plannerState.bakes.filter(b => b.recipeId !== recipeId);
+      // Clean up both weeks
+      ['current', 'next'].forEach(wk => {
+        for (const day of DAYS_ORDER) {
+          plannerState[wk].days[day] = plannerState[wk].days[day].filter(slot => slot.recipeId !== recipeId);
+        }
+        plannerState[wk].bakes = plannerState[wk].bakes.filter(b => b.recipeId !== recipeId);
+      });
       await persistPlanner();
 
       closeModal('recipeDetailModal');
@@ -2304,14 +2407,24 @@
     }
 
     /* ==========================================================================
-       7. WEEKLY MEAL SCHEDULER
+       7. DUAL-WEEK PLANNER MANAGEMENT
        ========================================================================== */
+    function setPlannerActiveWeek(weekKey) {
+      activePlannerWeek = weekKey;
+      document.getElementById('btnWeekCurrent').classList.toggle('active', weekKey === 'current');
+      document.getElementById('btnWeekNext').classList.toggle('active', weekKey === 'next');
+      document.getElementById('plannerWeekNotice').textContent = 
+        weekKey === 'current' ? 'Planning for This Week' : 'Planning for The Following Week';
+      renderWeeklyPlanner();
+    }
+
     function openScheduleModal(recipeId) {
       const recipe = recipesState.find(r => r.id === recipeId);
       if (!recipe) return;
 
       document.getElementById('scheduleRecipeId').value = recipe.id;
       document.getElementById('scheduleRecipeTitleBanner').textContent = `Scheduling: ${recipe.title}`;
+      document.getElementById('scheduleTargetWeekSelect').value = activePlannerWeek;
       
       const isBaked = recipe.tags.some(t => t.toLowerCase().includes('bake') || t.toLowerCase().includes('bread') || t.toLowerCase().includes('pastry'));
       document.getElementById('scheduleCategorySelect').value = isBaked ? 'Baked Goods' : 'Dinner';
@@ -2340,10 +2453,15 @@
 
     async function commitScheduleSelection() {
       const recipeId = document.getElementById('scheduleRecipeId').value;
+      const targetWeek = document.getElementById('scheduleTargetWeekSelect').value;
       const category = document.getElementById('scheduleCategorySelect').value;
 
+      if (!plannerState[targetWeek]) {
+        plannerState[targetWeek] = { bakes: [], days: { Monday: [], Tuesday: [], Wednesday: [], Thursday: [], Friday: [], Saturday: [], Sunday: [] } };
+      }
+
       if (category === 'Baked Goods') {
-        plannerState.bakes.push({
+        plannerState[targetWeek].bakes.push({
           instanceId: 'bake_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5),
           recipeId
         });
@@ -2356,7 +2474,7 @@
 
         checkedDays.forEach(day => {
           const isLeftover = document.querySelector(`.schedule-leftover-check[data-day="${day}"]`)?.checked || false;
-          plannerState.days[day].push({
+          plannerState[targetWeek].days[day].push({
             instanceId: 'slot_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5),
             recipeId,
             mealType: category,
@@ -2365,21 +2483,27 @@
         });
       }
 
+      // Sync active view to whichever week was scheduled
+      setPlannerActiveWeek(targetWeek);
       await persistPlanner();
       closeModal('scheduleMealModal');
       switchView('planner');
     }
 
     function renderWeeklyPlanner() {
+      const currentPlan = plannerState[activePlannerWeek] || { bakes: [], days: {} };
+
+      // 1. Hearth Bakes
       const bakesContainer = document.getElementById('hearthBakesContainer');
-      if (plannerState.bakes.length === 0) {
+      const bakesList = currentPlan.bakes || [];
+      if (bakesList.length === 0) {
         bakesContainer.innerHTML = `
           <div style="font-size: 0.85rem; color: var(--ink-muted); font-style: italic; padding: 0.5rem 0;">
-            No weekly bakes scheduled. Add a sourdough boule, breakfast bake, or treat for the week.
+            No bakes scheduled for ${activePlannerWeek === 'current' ? 'this week' : 'the following week'}. Add a sourdough boule, loaf, or breakfast bake.
           </div>
         `;
       } else {
-        bakesContainer.innerHTML = plannerState.bakes.map(item => {
+        bakesContainer.innerHTML = bakesList.map(item => {
           const recipe = recipesState.find(r => r.id === item.recipeId);
           if (!recipe) return '';
           return `
@@ -2388,15 +2512,16 @@
                 <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--accent-brass); font-weight: 700;">Hearth Provision</div>
                 <div style="font-weight: 600; font-size: 0.95rem; cursor: pointer;" onclick="openRecipeFolio('${recipe.id}')">${recipe.title}</div>
               </div>
-              <button class="btn-slot-delete" onclick="removeBakeItem('${item.instanceId}')">&times;</button>
+              <button class="btn-slot-delete" onclick="removeBakeItem('${activePlannerWeek}', '${item.instanceId}')">&times;</button>
             </div>
           `;
         }).join('');
       }
 
+      // 2. Weekdays Grid
       const grid = document.getElementById('weeklyScheduleGrid');
       grid.innerHTML = DAYS_ORDER.map(day => {
-        const slots = plannerState.days[day] || [];
+        const slots = (currentPlan.days && currentPlan.days[day]) || [];
         return `
           <div class="day-column">
             <div class="day-col-header">
@@ -2412,7 +2537,7 @@
                 const title = recipe ? recipe.title : 'Archived Dish';
                 return `
                   <div class="slot-block ${slot.isLeftover ? 'is-leftover' : ''}">
-                    <button class="btn-slot-delete" onclick="removeMealSlot('${day}', '${slot.instanceId}')">&times;</button>
+                    <button class="btn-slot-delete" onclick="removeMealSlot('${activePlannerWeek}', '${day}', '${slot.instanceId}')">&times;</button>
                     <div class="slot-type-label">
                       <span>${slot.mealType}</span>
                       ${slot.isLeftover ? '<span class="leftover-flag">🍲 Leftover</span>' : ''}
@@ -2422,63 +2547,85 @@
                 `;
               }).join('')}
             </div>
-            <button class="btn-add-to-day" onclick="promptAddDishToDay('${day}')">+ Add Meal</button>
+            <button class="btn-add-to-day" onclick="promptAddDishToDay('${activePlannerWeek}', '${day}')">+ Add Meal</button>
           </div>
         `;
       }).join('');
     }
 
-    async function removeMealSlot(day, instanceId) {
-      plannerState.days[day] = plannerState.days[day].filter(s => s.instanceId !== instanceId);
+    async function removeMealSlot(weekKey, day, instanceId) {
+      if (!plannerState[weekKey] || !plannerState[weekKey].days[day]) return;
+      plannerState[weekKey].days[day] = plannerState[weekKey].days[day].filter(s => s.instanceId !== instanceId);
       await persistPlanner();
     }
 
-    async function removeBakeItem(instanceId) {
-      plannerState.bakes = plannerState.bakes.filter(b => b.instanceId !== instanceId);
+    async function removeBakeItem(weekKey, instanceId) {
+      if (!plannerState[weekKey] || !plannerState[weekKey].bakes) return;
+      plannerState[weekKey].bakes = plannerState[weekKey].bakes.filter(b => b.instanceId !== instanceId);
       await persistPlanner();
     }
 
-    function promptAddDishToDay(day) {
+    function promptAddDishToDay(weekKey, day) {
       if (recipesState.length === 0) {
         alert('Please add a recipe to your folio first.');
         return;
       }
+      activePlannerWeek = weekKey;
       openScheduleModal(recipesState[0].id);
       setTimeout(() => {
+        document.getElementById('scheduleTargetWeekSelect').value = weekKey;
         const targetCheck = document.querySelector(`.schedule-day-check[value="${day}"]`);
         if (targetCheck) targetCheck.checked = true;
       }, 50);
     }
 
     /* ==========================================================================
-       8. WEEKEND PREP NAVIGATOR & BATCH COOKING
+       8. WEEKEND PREP NAVIGATOR (DUAL WEEK FILTERING)
        ========================================================================== */
+    function setPrepScope(scope) {
+      activePrepScope = scope;
+      document.getElementById('btnPrepCurrent').classList.toggle('active', scope === 'current');
+      document.getElementById('btnPrepNext').classList.toggle('active', scope === 'next');
+      document.getElementById('btnPrepBoth').classList.toggle('active', scope === 'both');
+      renderWeekendPrepWorkspace();
+    }
+
     function renderWeekendPrepWorkspace() {
       const container = document.getElementById('weekendPrepListContainer');
+      const weeksToScan = activePrepScope === 'both' ? ['current', 'next'] : [activePrepScope];
       const plannedRecipeMap = new Map();
 
-      // Collect all recipes from planned meals
-      for (const day of DAYS_ORDER) {
-        (plannerState.days[day] || []).forEach(slot => {
-          if (!slot.isLeftover) {
-            const recipe = recipesState.find(r => r.id === slot.recipeId);
-            if (recipe) {
-              if (!plannedRecipeMap.has(recipe.id)) {
-                plannedRecipeMap.set(recipe.id, { recipe, days: [day] });
-              } else {
-                plannedRecipeMap.get(recipe.id).days.push(day);
+      weeksToScan.forEach(wk => {
+        const plan = plannerState[wk] || { bakes: [], days: {} };
+        const weekPrefix = wk === 'current' ? 'This Wk' : 'Next Wk';
+
+        for (const day of DAYS_ORDER) {
+          (plan.days[day] || []).forEach(slot => {
+            if (!slot.isLeftover) {
+              const recipe = recipesState.find(r => r.id === slot.recipeId);
+              if (recipe) {
+                const scheduleLabel = `${weekPrefix}: ${day} (${slot.mealType})`;
+                if (!plannedRecipeMap.has(recipe.id)) {
+                  plannedRecipeMap.set(recipe.id, { recipe, schedules: [scheduleLabel] });
+                } else {
+                  plannedRecipeMap.get(recipe.id).schedules.push(scheduleLabel);
+                }
               }
+            }
+          });
+        }
+
+        (plan.bakes || []).forEach(bake => {
+          const recipe = recipesState.find(r => r.id === bake.recipeId);
+          if (recipe) {
+            const scheduleLabel = `${weekPrefix}: Whole Week Bake`;
+            if (!plannedRecipeMap.has(recipe.id)) {
+              plannedRecipeMap.set(recipe.id, { recipe, schedules: [scheduleLabel] });
+            } else {
+              plannedRecipeMap.get(recipe.id).schedules.push(scheduleLabel);
             }
           }
         });
-      }
-
-      // Collect from hearth bakes
-      (plannerState.bakes || []).forEach(bake => {
-        const recipe = recipesState.find(r => r.id === bake.recipeId);
-        if (recipe && !plannedRecipeMap.has(recipe.id)) {
-          plannedRecipeMap.set(recipe.id, { recipe, days: ['Whole Week Bake'] });
-        }
       });
 
       const prepEligible = Array.from(plannedRecipeMap.values()).filter(item => !!item.recipe.weekendPrep);
@@ -2487,14 +2634,13 @@
         container.innerHTML = `
           <div style="text-align: center; padding: 3rem 1rem; color: var(--ink-muted);">
             <p class="serif" style="font-size: 1.3rem; color: var(--accent-forest); margin-bottom: 0.5rem;">No Weekend Prep Actions Scheduled</p>
-            <p style="font-size: 0.9rem;">None of the meals currently scheduled on your Weekly Menu have weekend prep-ahead notes attached.</p>
-            <p style="font-size: 0.85rem; margin-top: 0.5rem;">Edit your recipes to add advance steps like marinades, roasted vegetables, doughs, or baked egg bites.</p>
+            <p style="font-size: 0.9rem;">None of the meals scheduled for the selected scope have prep-ahead notes attached.</p>
           </div>
         `;
         return;
       }
 
-      container.innerHTML = prepEligible.map(({ recipe, days }) => {
+      container.innerHTML = prepEligible.map(({ recipe, schedules }) => {
         const checkKey = `prep_${recipe.id}`;
         const isChecked = !!checkedPrepTasks[checkKey];
 
@@ -2505,7 +2651,7 @@
               <div style="flex: 1;">
                 <div class="prep-task-head">
                   <span class="prep-dish-title" onclick="openRecipeFolio('${recipe.id}')">${recipe.title}</span>
-                  <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-brass); font-weight: 700;">Scheduled for: ${days.join(', ')}</span>
+                  <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-brass); font-weight: 700;">Scheduled: ${schedules.join(' • ')}</span>
                 </div>
                 <div class="prep-instructions-box">${recipe.weekendPrep}</div>
               </div>
@@ -2533,7 +2679,7 @@
     }
 
     /* ==========================================================================
-       9. MARKET BASKET & INGREDIENT AGGREGATION ENGINE
+       9. MARKET BASKET & AGGREGATION ENGINE (MID-WEEK MULTI-WEEK SUPPORT)
        ========================================================================== */
     const UNIT_SYNONYMS = {
       'tbsp': 'tbsp', 'tablespoon': 'tbsp', 'tablespoons': 'tbsp', 'tbs': 'tbsp', 'T': 'tbsp',
@@ -2605,21 +2751,35 @@
       return fracStr;
     }
 
+    function setBasketScope(scope) {
+      activeBasketScope = scope;
+      document.getElementById('btnBasketScopeCurrent').classList.toggle('active', scope === 'current');
+      document.getElementById('btnBasketScopeNext').classList.toggle('active', scope === 'next');
+      document.getElementById('btnBasketScopeBoth').classList.toggle('active', scope === 'both');
+      renderMarketBasket();
+    }
+
     function compileWeeklyBasket() {
       const activeRecipeInstances = [];
+      const weeksToHarvest = activeBasketScope === 'both' ? ['current', 'next'] : [activeBasketScope];
 
-      for (const day of DAYS_ORDER) {
-        (plannerState.days[day] || []).forEach(slot => {
-          if (!slot.isLeftover) {
-            const recipe = recipesState.find(r => r.id === slot.recipeId);
-            if (recipe) activeRecipeInstances.push({ recipe, source: `${day} (${slot.mealType})` });
-          }
+      weeksToHarvest.forEach(wk => {
+        const plan = plannerState[wk] || { bakes: [], days: {} };
+        const weekTag = wk === 'current' ? 'This Wk' : 'Next Wk';
+
+        for (const day of DAYS_ORDER) {
+          (plan.days[day] || []).forEach(slot => {
+            if (!slot.isLeftover) {
+              const recipe = recipesState.find(r => r.id === slot.recipeId);
+              if (recipe) activeRecipeInstances.push({ recipe, source: `${weekTag} ${day} (${slot.mealType})` });
+            }
+          });
+        }
+
+        (plan.bakes || []).forEach(bake => {
+          const recipe = recipesState.find(r => r.id === bake.recipeId);
+          if (recipe) activeRecipeInstances.push({ recipe, source: `${weekTag} Hearth Bake` });
         });
-      }
-
-      (plannerState.bakes || []).forEach(bake => {
-        const recipe = recipesState.find(r => r.id === bake.recipeId);
-        if (recipe) activeRecipeInstances.push({ recipe, source: 'Weekly Bake' });
       });
 
       const aggregated = {};
@@ -2650,7 +2810,7 @@
           if (ing.detail && !aggregated[rootKey].details.includes(ing.detail)) {
             aggregated[rootKey].details.push(ing.detail);
           }
-          aggregated[rootKey].sources.push(`${recipe.title} (${source})`);
+          aggregated[rootKey].sources.push(`${recipe.title} [${source}]`);
         });
       });
 
