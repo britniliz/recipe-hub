@@ -905,15 +905,43 @@
       padding-bottom: 0.5rem;
     }
 
+    /* Fixed & Hardened Hearth Card Styling */
     .bake-pill-card {
       background: var(--bg-parchment);
       border: 1px solid var(--border-warm);
       border-radius: var(--radius-sm);
-      padding: 0.6rem 0.9rem;
-      min-width: 220px;
+      padding: 0.6rem 0.85rem;
+      min-width: 250px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .btn-bake-delete {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #ebdcc8;
+      border: 1px solid var(--border-strong);
+      color: var(--accent-terracotta);
+      font-size: 1.1rem;
+      font-weight: 700;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+
+    .btn-bake-delete:hover {
+      background: var(--accent-terracotta);
+      color: #ffffff;
+      border-color: var(--accent-terracotta);
+      transform: scale(1.08);
     }
 
     .week-days-grid {
@@ -1383,7 +1411,7 @@
       </div>
     </section>
 
-    <!-- VIEW 4: MARKET BASKET (AGGREGATED GROCERY WITH MID-WEEK MULTI-WEEK AGGREGATION) -->
+    <!-- VIEW 4: MARKET BASKET -->
     <section id="view-basket" class="view-panel">
       <div class="market-basket-layout">
         <div class="basket-sheet">
@@ -1607,7 +1635,7 @@
     </div>
   </div>
 
-  <!-- MULTI-DAY MEAL SCHEDULER MODAL (SUPPORTS THIS WEEK & NEXT WEEK) -->
+  <!-- MULTI-DAY MEAL SCHEDULER MODAL -->
   <div id="scheduleMealModal" class="modal-overlay">
     <div class="modal-dialog" style="max-width: 520px;">
       <div class="modal-header">
@@ -2384,7 +2412,7 @@
     }
 
     /* ==========================================================================
-       7. DUAL-WEEK PLANNER MANAGEMENT
+       7. DUAL-WEEK PLANNER MANAGEMENT & BULLETPROOF BAKE CLEARING
        ========================================================================== */
     function setPlannerActiveWeek(weekKey) {
       activePlannerWeek = weekKey;
@@ -2469,7 +2497,7 @@
     function renderWeeklyPlanner() {
       const currentPlan = plannerState[activePlannerWeek] || { bakes: [], days: {} };
 
-      // 1. Hearth Bakes
+      // 1. Hearth Bakes (Prominently rendered with direct index-safe deletion)
       const bakesContainer = document.getElementById('hearthBakesContainer');
       const bakesList = currentPlan.bakes || [];
       if (bakesList.length === 0) {
@@ -2479,18 +2507,22 @@
           </div>
         `;
       } else {
-        bakesContainer.innerHTML = bakesList.map(item => {
+        bakesContainer.innerHTML = bakesList.map((item, idx) => {
           const recipeId = typeof item === 'string' ? item : (item.recipeId || item.id);
-          const deleteKey = typeof item === 'string' ? item : (item.instanceId || item.recipeId || item.id);
           const recipe = recipesState.find(r => r.id === recipeId);
-          if (!recipe) return '';
+          const title = recipe ? recipe.title : 'Archived Hearth Bake';
+          
           return `
             <div class="bake-pill-card">
-              <div>
+              <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                 <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--accent-brass); font-weight: 700;">Hearth Provision</div>
-                <div style="font-weight: 600; font-size: 0.95rem; cursor: pointer;" onclick="openRecipeFolio('${recipe.id}')">${recipe.title}</div>
+                <div style="font-weight: 600; font-size: 0.95rem; cursor: pointer;" onclick="openRecipeFolio('${recipeId}')">${title}</div>
               </div>
-              <button class="btn-slot-delete" onclick="removeBakeItem('${activePlannerWeek}', '${deleteKey}')">&times;</button>
+              <button 
+                type="button" 
+                class="btn-bake-delete" 
+                title="Remove from weekly bakes" 
+                onclick="removeBakeItem(event, '${activePlannerWeek}', ${idx})">&times;</button>
             </div>
           `;
         }).join('');
@@ -2537,19 +2569,30 @@
       await persistPlanner();
     }
 
-    async function removeBakeItem(weekKey, identifier) {
-      if (!plannerState[weekKey]) return;
-      if (!Array.isArray(plannerState[weekKey].bakes)) {
-        plannerState[weekKey].bakes = [];
-        await persistPlanner();
-        return;
+    // Direct, failsafe removal function
+    async function removeBakeItem(event, weekKey, itemIndex) {
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
       }
-      plannerState[weekKey].bakes = plannerState[weekKey].bakes.filter(b => {
-        if (typeof b === 'string') return b !== identifier;
-        return b.instanceId !== identifier && b.recipeId !== identifier && b.id !== identifier;
-      });
+
+      if (!plannerState[weekKey] || !Array.isArray(plannerState[weekKey].bakes)) return;
+      
+      // Delete precisely by array index position
+      if (typeof itemIndex === 'number' && itemIndex >= 0 && itemIndex < plannerState[weekKey].bakes.length) {
+        plannerState[weekKey].bakes.splice(itemIndex, 1);
+      } else {
+        // Fallback for ID match
+        const idStr = String(itemIndex);
+        plannerState[weekKey].bakes = plannerState[weekKey].bakes.filter(b => {
+          if (typeof b === 'string') return b !== idStr;
+          return b.instanceId !== idStr && b.recipeId !== idStr && b.id !== idStr;
+        });
+      }
+
       await persistPlanner();
       renderWeeklyPlanner();
+      renderMarketBasket();
     }
 
     function promptAddDishToDay(weekKey, day) {
@@ -2603,7 +2646,7 @@
         }
 
         (plan.bakes || []).forEach(bake => {
-          const recipe = recipesState.find(r => r.id === bake.recipeId);
+          const recipe = recipesState.find(r => r.id === (bake.recipeId || bake.id || bake));
           if (recipe) {
             const scheduleLabel = `${weekPrefix}: Whole Week Bake`;
             if (!plannedRecipeMap.has(recipe.id)) {
@@ -2764,7 +2807,7 @@
         }
 
         (plan.bakes || []).forEach(bake => {
-          const recipe = recipesState.find(r => r.id === bake.recipeId);
+          const recipe = recipesState.find(r => r.id === (bake.recipeId || bake.id || bake));
           if (recipe) activeRecipeInstances.push({ recipe, source: `${weekTag} Hearth Bake` });
         });
       });
