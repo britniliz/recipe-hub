@@ -2051,8 +2051,126 @@
     /* =====================================================================
        MARKET BASKET: SMART INGREDIENT AGGREGATION & BREAKDOWN (VIEW 4)
        ===================================================================== */
-    function normalizeIngredientName(name) {
-      return (name || '').trim().toLowerCase().replace(/s$/, ''); // Basic singularization for clean match
+    // Comprehensive dictionary of ingredient aliases, stopwords, and units
+    const UNIT_ALIASES = {
+      'tbsp': 'tbsp', 'tablespoon': 'tbsp', 'tablespoons': 'tbsp', 'tbs': 'tbsp', 'tb': 'tbsp', 't': 'tsp',
+      'tsp': 'tsp', 'teaspoon': 'tsp', 'teaspoons': 'tsp',
+      'cup': 'cup', 'cups': 'cup', 'c': 'cup',
+      'oz': 'oz', 'ounce': 'oz', 'ounces': 'oz', 'fl oz': 'fl oz', 'fluid ounce': 'fl oz', 'fluid ounces': 'fl oz',
+      'lb': 'lb', 'lbs': 'lb', 'pound': 'lb', 'pounds': 'lb',
+      'g': 'g', 'gram': 'g', 'grams': 'g',
+      'kg': 'kg', 'kilogram': 'kg', 'kilograms': 'kg',
+      'ml': 'ml', 'milliliter': 'ml', 'milliliters': 'ml',
+      'l': 'l', 'liter': 'l', 'liters': 'l',
+      'clove': 'clove', 'cloves': 'clove',
+      'piece': 'piece', 'pieces': 'piece', 'pc': 'piece', 'pcs': 'piece',
+      'pinch': 'pinch', 'pinches': 'pinch',
+      'can': 'can', 'cans': 'can',
+      'bunch': 'bunch', 'bunches': 'bunch',
+      'fillet': 'fillet', 'fillets': 'fillet',
+      'stalk': 'stalk', 'stalks': 'stalk',
+      'sprig': 'sprig', 'sprigs': 'sprig',
+      'slice': 'slice', 'slices': 'slice'
+    };
+
+    // Standard culinary unit volume ratios relative to teaspoon (for seamless unit merging)
+    const VOLUME_TO_TSP = {
+      'tsp': 1,
+      'tbsp': 3,
+      'fl oz': 6,
+      'cup': 48
+    };
+
+    // Common descriptive adjectives and packaging words to strip to find the true ingredient root
+    const DESCRIPTIVE_QUALIFIERS = [
+      'paste', 'sauce', 'white', 'red', 'yellow', 'brown', 'organic', 'fresh', 'raw', 'whole',
+      'pure', 'dark', 'light', 'unbleached', 'all-purpose', 'dry', 'dried', 'sweet', 'salted',
+      'unsalted', 'extra-virgin', 'virgin', 'cold-pressed', 'coarse', 'fine', 'ground', 'crushed',
+      'grated', 'minced', 'chopped', 'sliced', 'diced', 'peeled', 'seeded', 'shredded', 'melted',
+      'softened', 'warm', 'cold', 'lukewarm', 'toasted', 'roasted', 'smoked'
+    ];
+
+    function parseFractionOrNumber(str) {
+      if (!str || typeof str !== 'string') {
+        const num = parseFloat(str);
+        return isNaN(num) ? 0 : num;
+      }
+      str = str.trim();
+      // Handle mixed fractions like "1 1/2" or "2 1/4"
+      if (str.includes(' ')) {
+        const parts = str.split(/\s+/);
+        const whole = parseFloat(parts[0]) || 0;
+        const frac = parseFractionOrNumber(parts[1]);
+        return whole + frac;
+      }
+      // Handle simple fractions like "3/4"
+      if (str.includes('/')) {
+        const [num, den] = str.split('/');
+        const n = parseFloat(num);
+        const d = parseFloat(den);
+        return (d && !isNaN(n) && !isNaN(d)) ? (n / d) : 0;
+      }
+      const val = parseFloat(str);
+      return isNaN(val) ? 0 : val;
+    }
+
+    function formatCulinaryAmount(val) {
+      if (!val || val <= 0) return '';
+      // Clean small floating point errors
+      val = Math.round(val * 1000) / 1000;
+      const whole = Math.floor(val);
+      const remainder = val - whole;
+
+      // Common fractions lookup
+      const fractions = [
+        { decimal: 0.125, text: '1/8' },
+        { decimal: 0.25, text: '1/4' },
+        { decimal: 0.333, text: '1/3' },
+        { decimal: 0.5, text: '1/2' },
+        { decimal: 0.666, text: '2/3' },
+        { decimal: 0.75, text: '3/4' }
+      ];
+
+      for (const frac of fractions) {
+        if (Math.abs(remainder - frac.decimal) < 0.05) {
+          return whole > 0 ? `${whole} ${frac.text}` : frac.text;
+        }
+      }
+
+      if (remainder === 0) return `${whole}`;
+      return `${Math.round(val * 100) / 100}`;
+    }
+
+    function normalizeUnit(unitStr) {
+      if (!unitStr) return '';
+      const clean = unitStr.trim().toLowerCase().replace(/[\(\)\.]/g, '');
+      return UNIT_ALIASES[clean] || clean;
+    }
+
+    function extractIngredientRootKey(name) {
+      if (!name) return { key: '', displayName: '' };
+      
+      let tokens = name
+        .toLowerCase()
+        .replace(/[,\(\)\.\*\-]/g, ' ')
+        .split(/\s+/)
+        .map(t => t.trim())
+        .filter(Boolean);
+
+      // Singularize basic English plurals
+      tokens = tokens.map(t => t.replace(/ies$/, 'y').replace(/ves$/, 'f').replace(/s$/, ''));
+
+      // Filter out descriptive modifiers and adjectives
+      const significantTokens = tokens.filter(t => !DESCRIPTIVE_QUALIFIERS.includes(t));
+
+      // Key for grouping
+      const key = (significantTokens.length > 0 ? significantTokens : tokens).sort().join('_');
+      
+      // Capitalized display name from significant tokens
+      const primaryWords = significantTokens.length > 0 ? significantTokens : tokens;
+      const displayName = primaryWords.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+      return { key, displayName: displayName || name.trim() };
     }
 
     function getAggregatedShoppingList() {
@@ -2069,43 +2187,65 @@
         const cat = item.category || 'Pantry & Spices';
         if (!categoryMap[cat]) categoryMap[cat] = [];
 
-        const normalizedName = normalizeIngredientName(item.name);
-        const itemUnit = (item.unit || '').trim().toLowerCase();
+        const { key: rootKey, displayName } = extractIngredientRootKey(item.name);
+        const canonicalUnit = normalizeUnit(item.unit);
+        const parsedAmount = parseFractionOrNumber(item.amount);
 
-        // Match existing item in category by normalized name & unit
-        const existing = categoryMap[cat].find(x => 
-          normalizeIngredientName(x.name) === normalizedName &&
-          (x.unit || '').trim().toLowerCase() === itemUnit
-        );
+        // Find match in category by matching normalized root key
+        let existing = categoryMap[cat].find(x => x.rootKey === rootKey);
 
         if (existing) {
-          // Sum numerical amounts when matching units
-          const n1 = parseFloat(existing.totalAmount);
-          const n2 = parseFloat(item.amount);
-          if (!isNaN(n1) && !isNaN(n2)) {
-            existing.totalAmount = Math.round((n1 + n2) * 100) / 100;
-          } else if (item.amount) {
-            existing.totalAmount = `${existing.totalAmount} + ${item.amount}`;
+          // If units are identical, directly sum
+          if (existing.unit === canonicalUnit) {
+            existing.numericTotal += parsedAmount;
+          } 
+          // If both units are convertable volume units (tsp, tbsp, cup, fl oz)
+          else if (VOLUME_TO_TSP[existing.unit] && VOLUME_TO_TSP[canonicalUnit]) {
+            const currentTotalTsp = existing.numericTotal * VOLUME_TO_TSP[existing.unit];
+            const incomingTsp = parsedAmount * VOLUME_TO_TSP[canonicalUnit];
+            const newTotalTsp = currentTotalTsp + incomingTsp;
+
+            // Pick the best intuitive presentation unit
+            if (newTotalTsp >= 48) {
+              existing.unit = 'cup';
+              existing.numericTotal = newTotalTsp / 48;
+            } else if (newTotalTsp >= 3) {
+              existing.unit = 'tbsp';
+              existing.numericTotal = newTotalTsp / 3;
+            } else {
+              existing.unit = 'tsp';
+              existing.numericTotal = newTotalTsp;
+            }
+          } 
+          // If units are mixed or incompatible (e.g. 1 can vs 2 tbsp)
+          else {
+            existing.unmatchedAmounts.push({
+              amount: item.amount,
+              unit: item.unit
+            });
           }
 
-          // Add breakdown detail
+          // Append breakdown line
           existing.breakdowns.push({
             recipeTitle: recipeTitle,
+            originalName: item.name,
             amount: item.amount,
             unit: item.unit,
             detail: item.detail
           });
         } else {
-          // Create consolidated entry
-          const n = parseFloat(item.amount);
+          // First appearance of this ingredient root
           categoryMap[cat].push({
-            id: `ing_${normalizedName.replace(/[^a-z0-9]/g, '_')}_${itemUnit}`,
-            name: item.name,
-            totalAmount: !isNaN(n) ? n : (item.amount || ''),
-            unit: item.unit || '',
+            id: `ing_${rootKey}`,
+            rootKey: rootKey,
+            name: displayName || item.name,
+            numericTotal: parsedAmount,
+            unit: canonicalUnit,
+            unmatchedAmounts: [],
             category: cat,
             breakdowns: [{
               recipeTitle: recipeTitle,
+              originalName: item.name,
               amount: item.amount,
               unit: item.unit,
               detail: item.detail
@@ -2117,8 +2257,7 @@
       // 1. Gather ingredients from Daily Planned Meals
       DAYS_OF_WEEK.forEach(day => {
         (state.planner[day] || []).forEach(meal => {
-          // Note: Leftovers use the batch already cooked on prep day!
-          // Only harvest ingredients for fresh cook days so groceries aren't duplicated unnecessarily.
+          // Note: Leftovers consume the batch already prepared on cooking day!
           if (!meal.isLeftover) {
             const recipe = state.recipes.find(r => r.id === meal.recipeId);
             if (recipe && recipe.ingredients) {
@@ -2142,19 +2281,38 @@
         if (!categoryMap[cat]) categoryMap[cat] = [];
         categoryMap[cat].push({
           id: custom.id,
+          rootKey: custom.name.toLowerCase().replace(/\s+/g, '_'),
           name: custom.name,
-          totalAmount: '',
+          numericTotal: 0,
           unit: 'Staple',
+          unmatchedAmounts: [],
           category: cat,
-          breakdowns: [{ recipeTitle: 'Pantry Extra', amount: '', unit: '', detail: '' }],
+          breakdowns: [{ recipeTitle: 'Pantry Extra', originalName: custom.name, amount: '', unit: '', detail: '' }],
           isCustom: true
         });
       });
 
+      // Convert computed values to final formatted display strings
       const result = [];
       const order = ['Produce', 'Meat & Seafood', 'Dairy & Cold', 'Pantry & Spices', 'Bakery & Other'];
+      
       order.forEach(c => {
         if (categoryMap[c] && categoryMap[c].length > 0) {
+          categoryMap[c].forEach(item => {
+            if (item.isCustom) {
+              item.displayTotal = '';
+            } else {
+              const mainFormatted = formatCulinaryAmount(item.numericTotal);
+              let label = mainFormatted ? `${mainFormatted} ${item.unit}`.trim() : '';
+
+              if (item.unmatchedAmounts && item.unmatchedAmounts.length > 0) {
+                const extras = item.unmatchedAmounts.map(e => `${e.amount} ${e.unit}`.trim()).join(' + ');
+                label = label ? `${label} + ${extras}` : extras;
+              }
+              item.displayTotal = label;
+            }
+          });
+
           result.push({
             name: c,
             items: categoryMap[c]
@@ -2195,11 +2353,14 @@
           const isChecked = state.checkedShoppingItems.has(item.id);
           if (isChecked) checkedItems++;
 
-          // Build clean breakdowns of recipes & preparation details
+          // Build itemized breakdown of contributing dishes & specific prep styles
           const breakdownNotes = item.breakdowns.map(b => {
             const prep = b.detail ? ` (${b.detail})` : '';
-            const qty = b.amount ? `${b.amount} ${b.unit || ''}` : '';
-            return `${b.recipeTitle}${prep ? ': ' + prep : ''}`;
+            const specName = (b.originalName && b.originalName.toLowerCase() !== item.name.toLowerCase()) 
+              ? ` [as "${b.originalName}"]` 
+              : '';
+            const qty = b.amount ? `${b.amount} ${b.unit || ''} ` : '';
+            return `${b.recipeTitle}: ${qty}${specName}${prep}`.trim();
           }).join(' &bull; ');
 
           return `
@@ -2208,9 +2369,9 @@
               <div class="flex-1 min-w-0">
                 <div class="flex items-baseline justify-between gap-2">
                   <span class="text-sm font-semibold ${isChecked ? 'line-through text-charcoal-800/40' : 'text-charcoal-900'} transition-all">${item.name}</span>
-                  ${item.totalAmount ? `
-                    <span class="font-mono font-bold text-xs text-terracotta-600 shrink-0 bg-parchment-200/80 px-2 py-0.5 rounded-md border border-parchment-300">
-                      ${item.totalAmount} ${item.unit}
+                  ${item.displayTotal ? `
+                    <span class="font-mono font-bold text-xs text-terracotta-600 shrink-0 bg-parchment-200/80 px-2.5 py-0.5 rounded-md border border-parchment-300">
+                      ${item.displayTotal}
                     </span>
                   ` : ''}
                 </div>
