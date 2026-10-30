@@ -2490,7 +2490,7 @@
       switchView('planner');
     }
 
-    function renderWeeklyPlanner() {
+function renderWeeklyPlanner() {
       const currentPlan = plannerState[activePlannerWeek] || { bakes: [], days: {} };
 
       // 1. Hearth Bakes
@@ -2504,7 +2504,9 @@
         `;
       } else {
         bakesContainer.innerHTML = bakesList.map(item => {
-          const recipe = recipesState.find(r => r.id === item.recipeId);
+          const recipeId = typeof item === 'string' ? item : (item.recipeId || item.id);
+          const deleteKey = typeof item === 'string' ? item : (item.instanceId || item.recipeId || item.id);
+          const recipe = recipesState.find(r => r.id === recipeId);
           if (!recipe) return '';
           return `
             <div class="bake-pill-card">
@@ -2512,7 +2514,7 @@
                 <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--accent-brass); font-weight: 700;">Hearth Provision</div>
                 <div style="font-weight: 600; font-size: 0.95rem; cursor: pointer;" onclick="openRecipeFolio('${recipe.id}')">${recipe.title}</div>
               </div>
-              <button class="btn-slot-delete" onclick="removeBakeItem('${activePlannerWeek}', '${item.instanceId}')">&times;</button>
+              <button class="btn-slot-delete" onclick="removeBakeItem('${activePlannerWeek}', '${deleteKey}')">&times;</button>
             </div>
           `;
         }).join('');
@@ -2539,8 +2541,7 @@
                   <div class="slot-block ${slot.isLeftover ? 'is-leftover' : ''}">
                     <button class="btn-slot-delete" onclick="removeMealSlot('${activePlannerWeek}', '${day}', '${slot.instanceId}')">&times;</button>
                     <div class="slot-type-label">
-                      <span>${slot.mealType}</span>
-                      ${slot.isLeftover ? '<span class="leftover-flag">🍲 Leftover</span>' : ''}
+                      <span>${slot.mealType}</span>${slot.isLeftover ? '<span class="leftover-flag">🍲 Leftover</span>' : ''}
                     </div>
                     <div class="slot-dish-title" onclick="openRecipeFolio('${slot.recipeId}')">${title}</div>
                   </div>
@@ -2559,12 +2560,20 @@
       await persistPlanner();
     }
 
-    async function removeBakeItem(weekKey, instanceId) {
-      if (!plannerState[weekKey] || !plannerState[weekKey].bakes) return;
-      plannerState[weekKey].bakes = plannerState[weekKey].bakes.filter(b => b.instanceId !== instanceId);
+    async function removeBakeItem(weekKey, identifier) {
+      if (!plannerState[weekKey]) return;
+      if (!Array.isArray(plannerState[weekKey].bakes)) {
+        plannerState[weekKey].bakes = [];
+        await persistPlanner();
+        return;
+      }
+      plannerState[weekKey].bakes = plannerState[weekKey].bakes.filter(b => {
+        if (typeof b === 'string') return b !== identifier;
+        return b.instanceId !== identifier && b.recipeId !== identifier && b.id !== identifier;
+      });
       await persistPlanner();
+      renderWeeklyPlanner();
     }
-
     function promptAddDishToDay(weekKey, day) {
       if (recipesState.length === 0) {
         alert('Please add a recipe to your folio first.');
